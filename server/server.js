@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
-const fs = require('fs');
+
 
 
 // Load env vars from root .env
@@ -18,16 +18,11 @@ const app = express();
 app.use(cors({
   origin: "*"
 }));
-const uploadDir = path.join(__dirname, 'uploads');
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/products', require('./routes/productRoutes'));

@@ -1,28 +1,23 @@
 const express = require('express');
 const router = express.Router();
+
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
+
 const path = require('path');
 const Product = require('../models/Product');
 const { protect, admin } = require('../middleware/auth');
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, path.join(__dirname, '../uploads'));
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'sylbets-products',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   },
-  filename(req, file, cb) {
-    cb(null, `${Date.now()}${path.extname(file.originalname)}`);
-  }
 });
 
-const upload = multer({
-  storage,
-  fileFilter: function (req, file, cb) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|webp|avif|gif)$/)) {
-        return cb(new Error('Only image files are allowed!'), false);
-    }
-    cb(null, true);
-  }
-});
+const upload = multer({ storage });
 
 router.get('/', async (req, res) => {
   try {
@@ -76,30 +71,49 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', protect, admin, upload.single('image'), async (req, res) => {
-  try {
-    const { name, price, discountPrice, description, category, subcategory, stock, featured, bestSelling } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : '';
+router.post(
+  '/',
+  protect,
+  admin,
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      const {
+        name,
+        price,
+        discountPrice,
+        description,
+        category,
+        subcategory,
+        stock,
+        featured,
+        bestSelling
+      } = req.body;
 
-    const product = new Product({
-      name,
-      price: Number(price),
-      discountPrice: discountPrice ? Number(discountPrice) : null,
-      description,
-      category,
-      subcategory: subcategory || null,
-      image,
-      stock: Number(stock) || 0,
-      featured: featured === 'true',
-      bestSelling: bestSelling === 'true'
-    });
+      const product = new Product({
+        name,
+        price: Number(price),
+        discountPrice: discountPrice ? Number(discountPrice) : null,
+        description,
+        category,
+        subcategory: subcategory || null,
 
-    const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
-  } catch (error) {
-    res.status(500).json({ message: error.message || 'Server Error' });
+        // 🔥 CLOUDINARY URL
+        image: req.file ? req.file.path : '',
+
+        stock: Number(stock) || 0,
+        featured: featured === 'true',
+        bestSelling: bestSelling === 'true'
+      });
+
+      const createdProduct = await product.save();
+      res.status(201).json(createdProduct);
+
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
-});
+);
 
 router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
   try {

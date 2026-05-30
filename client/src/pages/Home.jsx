@@ -291,7 +291,7 @@ const Home = () => {
         <div className="container">
           <motion.div className="section-header" variants={fadeUp}>
             <span className="section-tag">Why Us</span>
-            <h2 className="section-title">Why Choose Sylbets</h2>
+            <h2 className="section-title">Why Choose Sylbet</h2>
             <p className="section-subtitle">We believe in quality, sustainability, and craftsmanship</p>
           </motion.div>
 

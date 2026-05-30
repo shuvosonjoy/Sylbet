@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = import.meta.env.VITE_API_URL + '/api';
 
 const handleResponse = async (response) => {
   if (!response.ok) {
@@ -25,6 +25,7 @@ const getHeaders = (token, isFormData = false) => {
 export const api = {
   // Auth
   login: async (credentials) => {
+    console.log(API_BASE);
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: getHeaders(),

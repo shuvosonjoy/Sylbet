@@ -99,7 +99,7 @@ router.post(
         subcategory: subcategory || null,
 
         // 🔥 CLOUDINARY URL
-        image: req.file ? req.file.path : '',
+       image: req.file ? req.file.path || req.file.secure_url : '',
 
         stock: Number(stock) || 0,
         featured: featured === 'true',
@@ -132,8 +132,8 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
       product.bestSelling = bestSelling !== undefined ? bestSelling === 'true' : product.bestSelling;
 
       if (req.file) {
-        product.image = `/uploads/${req.file.filename}`;
-      }
+  product.image = req.file.path || req.file.secure_url;
+}
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);

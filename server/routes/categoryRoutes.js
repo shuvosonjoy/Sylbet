@@ -28,8 +28,16 @@ router.get('/', async (req, res) => {
 router.post('/', protect, admin, upload.single('image'), async (req, res) => {
   try {
     const { name, description } = req.body;
+    console.log('=== Create Category ===');
+    console.log('Body:', { name, description });
+    console.log('File exists:', !!req.file);
+    if (req.file) {
+      console.log('File details:', { fieldname: req.file.fieldname, originalname: req.file.originalname, size: req.file.size });
+      console.log('Cloudinary secure_url:', req.file.secure_url);
+    } else {
+      console.log('NO FILE IN REQUEST');
+    }
     const image = req.file ? req.file.secure_url : '';
-    console.log('Create Category - File:', req.file ? 'YES' : 'NO', 'Image URL:', image);
     const category = new Category({ name, description, image });
     const createdCategory = await category.save();
     res.status(201).json(createdCategory);

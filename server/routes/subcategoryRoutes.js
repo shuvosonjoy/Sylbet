@@ -45,8 +45,18 @@ router.get('/:id', async (req, res) => {
 router.post('/', protect, admin, upload.single('image'), async (req, res) => {
   try {
     const { name, description, category } = req.body;
+    console.log('=== Create Subcategory ===');
+    console.log('Body:', { name, description, category });
+    console.log('File exists:', !!req.file);
+    if (req.file) {
+      console.log('File details:', { fieldname: req.file.fieldname, originalname: req.file.originalname, size: req.file.size });
+      console.log('Cloudinary secure_url:', req.file.secure_url);
+    } else {
+      console.log('NO FILE IN REQUEST');
+      console.log('Request headers:', req.headers);
+      console.log('All files:', req.files);
+    }
     const image = req.file ? req.file.secure_url : '';
-    console.log('Create Subcategory - File:', req.file ? 'YES' : 'NO', 'Image URL:', image);
     const subcategory = new Subcategory({ name, description, category, image });
     const created = await subcategory.save();
     res.status(201).json(created);

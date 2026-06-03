@@ -198,8 +198,21 @@ const AdminDashboard = () => {
       formData.append('name', subcategoryForm.name);
       formData.append('description', subcategoryForm.description);
       formData.append('category', subcategoryForm.category);
+
+      console.log('Subcategory form data:', {
+        name: subcategoryForm.name,
+        description: subcategoryForm.description,
+        category: subcategoryForm.category,
+        hasImage: !!subcategoryForm.image,
+        imageType: subcategoryForm.image?.constructor?.name,
+        imageSize: subcategoryForm.image?.size
+      });
+
       if (subcategoryForm.image) {
         formData.append('image', subcategoryForm.image);
+        console.log('Image appended to FormData');
+      } else {
+        console.log('NO IMAGE - subcategoryForm.image is:', subcategoryForm.image);
       }
 
       if (modalMode === 'add') {

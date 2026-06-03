@@ -26,8 +26,8 @@ const AdminDashboard = () => {
     category: '', subcategory: '', stock: '', featured: false, bestSelling: false, image: null,
   });
 
-  const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
-  const [subcategoryForm, setSubcategoryForm] = useState({ name: '', description: '', category: '' });
+  const [categoryForm, setCategoryForm] = useState({ name: '', description: '', image: null });
+  const [subcategoryForm, setSubcategoryForm] = useState({ name: '', description: '', category: '', image: null });
 
   useEffect(() => {
     fetchData();
@@ -113,9 +113,9 @@ const AdminDashboard = () => {
 
     if (activeTab === 'categories') {
       if (mode === 'edit' && item) {
-        setCategoryForm({ name: item.name || '', description: item.description || '' });
+        setCategoryForm({ name: item.name || '', description: item.description || '', image: null });
       } else {
-        setCategoryForm({ name: '', description: '' });
+        setCategoryForm({ name: '', description: '', image: null });
       }
     }
 
@@ -123,10 +123,10 @@ const AdminDashboard = () => {
       if (mode === 'edit' && item) {
         setSubcategoryForm({
           name: item.name || '', description: item.description || '',
-          category: item.category?._id || item.category || '',
+          category: item.category?._id || item.category || '', image: null,
         });
       } else {
-        setSubcategoryForm({ name: '', description: '', category: categories[0]?._id || '' });
+        setSubcategoryForm({ name: '', description: '', category: categories[0]?._id || '', image: null });
       }
     }
 
@@ -169,11 +169,18 @@ const AdminDashboard = () => {
   const handleCategorySubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('name', categoryForm.name);
+      formData.append('description', categoryForm.description);
+      if (categoryForm.image) {
+        formData.append('image', categoryForm.image);
+      }
+
       if (modalMode === 'add') {
-        await api.createCategory(categoryForm, token);
+        await api.createCategory(formData, token);
         showToast.success('Category created!');
       } else {
-        await api.updateCategory(currentItem._id, categoryForm, token);
+        await api.updateCategory(currentItem._id, formData, token);
         showToast.success('Category updated!');
       }
       closeModal();
@@ -187,11 +194,19 @@ const AdminDashboard = () => {
   const handleSubcategorySubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('name', subcategoryForm.name);
+      formData.append('description', subcategoryForm.description);
+      formData.append('category', subcategoryForm.category);
+      if (subcategoryForm.image) {
+        formData.append('image', subcategoryForm.image);
+      }
+
       if (modalMode === 'add') {
-        await api.createSubcategory(subcategoryForm, token);
+        await api.createSubcategory(formData, token);
         showToast.success('Subcategory created!');
       } else {
-        await api.updateSubcategory(currentItem._id, subcategoryForm, token);
+        await api.updateSubcategory(currentItem._id, formData, token);
         showToast.success('Subcategory updated!');
       }
       closeModal();
@@ -495,6 +510,11 @@ const AdminDashboard = () => {
             <textarea className="form-control" value={categoryForm.description}
               onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })} />
           </div>
+          <div className="form-group">
+            <label className="form-label">Thumbnail Image</label>
+            <input type="file" className="form-control" accept="image/*"
+              onChange={(e) => setCategoryForm({ ...categoryForm, image: e.target.files?.[0] || null })} />
+          </div>
           <button type="submit" className="btn btn-primary btn-block">Save Category</button>
         </form>
       );
@@ -520,6 +540,11 @@ const AdminDashboard = () => {
             <label className="form-label">Description</label>
             <textarea className="form-control" value={subcategoryForm.description}
               onChange={(e) => setSubcategoryForm({ ...subcategoryForm, description: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Thumbnail Image</label>
+            <input type="file" className="form-control" accept="image/*"
+              onChange={(e) => setSubcategoryForm({ ...subcategoryForm, image: e.target.files?.[0] || null })} />
           </div>
           <button type="submit" className="btn btn-primary btn-block">Save Subcategory</button>
         </form>

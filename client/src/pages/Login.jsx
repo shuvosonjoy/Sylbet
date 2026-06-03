@@ -63,6 +63,11 @@ const Login = () => {
               placeholder="Enter your password"
               required
             />
+            <div style={{ marginTop: '6px', textAlign: 'right' }}>
+              <Link to="/forgot-password" style={{ fontSize: '0.8125rem', color: 'var(--color-primary)' }}>
+                Forgot password?
+              </Link>
+            </div>
           </div>
           <button
             type="submit"

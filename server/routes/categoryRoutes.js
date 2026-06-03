@@ -1,7 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
 const Category = require('../models/Category');
 const { protect, admin } = require('../middleware/auth');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'sylbets-categories',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+  },
+});
+
+const upload = multer({ storage });
 
 router.get('/', async (req, res) => {
   try {
@@ -12,9 +25,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', protect, admin, async (req, res) => {
+router.post('/', protect, admin, upload.single('image'), async (req, res) => {
   try {
-    const { name, description, image } = req.body;
+    const { name, description } = req.body;
+    const image = req.file ? req.file.secure_url : '';
     const category = new Category({ name, description, image });
     const createdCategory = await category.save();
     res.status(201).json(createdCategory);
@@ -23,15 +37,17 @@ router.post('/', protect, admin, async (req, res) => {
   }
 });
 
-router.put('/:id', protect, admin, async (req, res) => {
+router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
   try {
-    const { name, description, image } = req.body;
+    const { name, description } = req.body;
     const category = await Category.findById(req.params.id);
 
     if (category) {
       category.name = name || category.name;
       category.description = description !== undefined ? description : category.description;
-      category.image = image !== undefined ? image : category.image;
+      if (req.file) {
+        category.image = req.file.secure_url;
+      }
 
       const updatedCategory = await category.save();
       res.json(updatedCategory);

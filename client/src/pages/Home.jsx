@@ -199,8 +199,28 @@ const Home = () => {
                   to={`/shop?subcategory=${subcategory._id}`}   // link directly to subcategory
                   className="category-card"
                 >
-                  <div className="category-card-icon">
-                    {subcategory.name.charAt(0)}
+                  <div className="category-card-icon" style={{ overflow: 'hidden', padding: 0 }}>
+                    {subcategory.image ? (
+                      <img
+                        src={subcategory.image}
+                        alt={subcategory.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const parent = e.target.parentElement;
+                          const existing = parent.querySelector('.category-fallback');
+                          if (existing) existing.remove();
+                          const fallback = document.createElement('div');
+                          fallback.className = 'category-fallback';
+                          fallback.textContent = subcategory.name.charAt(0);
+                          parent.appendChild(fallback);
+                        }}
+                      />
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-primary-dark)', backgroundColor: 'linear-gradient(135deg, rgba(4,57,39,0.08), rgba(4,57,39,0.04))' }}>
+                        {subcategory.name.charAt(0)}
+                      </div>
+                    )}
                   </div>
                   <h3 className="category-card-title">{subcategory.name}</h3>
                   <p className="category-card-desc">

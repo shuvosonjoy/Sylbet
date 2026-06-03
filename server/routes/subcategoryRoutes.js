@@ -1,7 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
 const Subcategory = require('../models/Subcategory');
 const { protect, admin } = require('../middleware/auth');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'sylbets-categories',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+  },
+});
+
+const upload = multer({ storage });
 
 router.get('/', async (req, res) => {
   try {
@@ -29,9 +42,10 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', protect, admin, async (req, res) => {
+router.post('/', protect, admin, upload.single('image'), async (req, res) => {
   try {
-    const { name, description, category, image } = req.body;
+    const { name, description, category } = req.body;
+    const image = req.file ? req.file.secure_url : '';
     const subcategory = new Subcategory({ name, description, category, image });
     const created = await subcategory.save();
     res.status(201).json(created);
@@ -40,16 +54,18 @@ router.post('/', protect, admin, async (req, res) => {
   }
 });
 
-router.put('/:id', protect, admin, async (req, res) => {
+router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
   try {
-    const { name, description, category, image } = req.body;
+    const { name, description, category } = req.body;
     const subcategory = await Subcategory.findById(req.params.id);
 
     if (subcategory) {
       subcategory.name = name || subcategory.name;
       subcategory.description = description !== undefined ? description : subcategory.description;
       subcategory.category = category || subcategory.category;
-      subcategory.image = image !== undefined ? image : subcategory.image;
+      if (req.file) {
+        subcategory.image = req.file.secure_url;
+      }
 
       const updated = await subcategory.save();
       res.json(updated);

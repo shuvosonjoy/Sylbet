@@ -25,7 +25,6 @@ const getHeaders = (token, isFormData = false) => {
 export const api = {
   // Auth
   login: async (credentials) => {
-    console.log(API_BASE);
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: getHeaders(),
@@ -53,6 +52,25 @@ export const api = {
   verifyAdmin: async (token) => {
     const res = await fetch(`${API_BASE}/auth/admin/verify`, {
       headers: getHeaders(token)
+    });
+    return handleResponse(res);
+  },
+
+  // Forgot / Reset Password
+  forgotPassword: async (email) => {
+    const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ email })
+    });
+    return handleResponse(res);
+  },
+
+  resetPassword: async (token, password) => {
+    const res = await fetch(`${API_BASE}/auth/reset-password/${token}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ password })
     });
     return handleResponse(res);
   },
@@ -104,8 +122,8 @@ export const api = {
   createCategory: async (data, token) => {
     const res = await fetch(`${API_BASE}/categories`, {
       method: 'POST',
-      headers: getHeaders(token),
-      body: JSON.stringify(data)
+      headers: getHeaders(token, data instanceof FormData),
+      body: data instanceof FormData ? data : JSON.stringify(data)
     });
     return handleResponse(res);
   },
@@ -113,8 +131,8 @@ export const api = {
   updateCategory: async (id, data, token) => {
     const res = await fetch(`${API_BASE}/categories/${id}`, {
       method: 'PUT',
-      headers: getHeaders(token),
-      body: JSON.stringify(data)
+      headers: getHeaders(token, data instanceof FormData),
+      body: data instanceof FormData ? data : JSON.stringify(data)
     });
     return handleResponse(res);
   },
@@ -137,8 +155,8 @@ export const api = {
   createSubcategory: async (data, token) => {
     const res = await fetch(`${API_BASE}/subcategories`, {
       method: 'POST',
-      headers: getHeaders(token),
-      body: JSON.stringify(data)
+      headers: getHeaders(token, data instanceof FormData),
+      body: data instanceof FormData ? data : JSON.stringify(data)
     });
     return handleResponse(res);
   },
@@ -146,8 +164,8 @@ export const api = {
   updateSubcategory: async (id, data, token) => {
     const res = await fetch(`${API_BASE}/subcategories/${id}`, {
       method: 'PUT',
-      headers: getHeaders(token),
-      body: JSON.stringify(data)
+      headers: getHeaders(token, data instanceof FormData),
+      body: data instanceof FormData ? data : JSON.stringify(data)
     });
     return handleResponse(res);
   },

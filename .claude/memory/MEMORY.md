@@ -1,0 +1,1 @@
+- [Sylbets UI/UX Fixes June 2026](sylbets-ux-fixes.md) — comprehensive responsive design audit and fixes for hero banner, navigation, forgot password, and category thumbnails

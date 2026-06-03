@@ -29,10 +29,12 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
   try {
     const { name, description } = req.body;
     const image = req.file ? req.file.secure_url : '';
+    console.log('Create Category - File:', req.file ? 'YES' : 'NO', 'Image URL:', image);
     const category = new Category({ name, description, image });
     const createdCategory = await category.save();
     res.status(201).json(createdCategory);
   } catch (error) {
+    console.error('Create Category Error:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 });

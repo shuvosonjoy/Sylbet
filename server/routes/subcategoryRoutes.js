@@ -46,10 +46,12 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
   try {
     const { name, description, category } = req.body;
     const image = req.file ? req.file.secure_url : '';
+    console.log('Create Subcategory - File:', req.file ? 'YES' : 'NO', 'Image URL:', image);
     const subcategory = new Subcategory({ name, description, category, image });
     const created = await subcategory.save();
     res.status(201).json(created);
   } catch (error) {
+    console.error('Create Subcategory Error:', error);
     res.status(500).json({ message: error.message || 'Server Error' });
   }
 });
@@ -58,6 +60,7 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
   try {
     const { name, description, category } = req.body;
     const subcategory = await Subcategory.findById(req.params.id);
+    console.log('Update Subcategory - File:', req.file ? 'YES' : 'NO', 'Image URL:', req.file?.secure_url);
 
     if (subcategory) {
       subcategory.name = name || subcategory.name;
@@ -65,6 +68,7 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
       subcategory.category = category || subcategory.category;
       if (req.file) {
         subcategory.image = req.file.secure_url;
+        console.log('Image updated to:', subcategory.image);
       }
 
       const updated = await subcategory.save();
@@ -73,6 +77,7 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
       res.status(404).json({ message: 'Subcategory not found' });
     }
   } catch (error) {
+    console.error('Update Subcategory Error:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 });

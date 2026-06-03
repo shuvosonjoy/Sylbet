@@ -211,6 +211,7 @@ const AdminDashboard = () => {
       }
       closeModal();
       fetchData();
+      fetchSubcategories();
     } catch (error) {
       showToast.error(error.message || 'Error saving subcategory');
     }

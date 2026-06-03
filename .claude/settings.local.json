@@ -4,7 +4,8 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(curl -s http://localhost:5174/)",
-      "Bash(curl -s http://localhost:5174/login)"
+      "Bash(curl -s http://localhost:5174/login)",
+      "Bash(curl -s http://localhost:5000/api/subcategories)"
     ]
   }
 }

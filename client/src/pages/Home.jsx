@@ -224,6 +224,7 @@ const Home = () => {
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         variants={stagger}
+        layout
       >
         <div className="container">
           <motion.div className="section-header" variants={fadeUp}>
@@ -232,7 +233,7 @@ const Home = () => {
             <p className="section-subtitle">Browse our curated collections of premium cane furniture</p>
           </motion.div>
 
-          <motion.div className="categories-grid" variants={stagger}>
+          <motion.div className="categories-grid" variants={stagger} layout>
             {subcategories.map((subcategory) => (
               <motion.div key={subcategory._id} variants={fadeUp}>
                 <Link

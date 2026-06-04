@@ -76,8 +76,11 @@ const Home = () => {
 
         setFeaturedProducts(featuredRes.products || []);
         setBestSelling(bestRes.products || []);
+        console.log('API Response - subsRes:', subsRes);
+        console.log('Total subcategories from API:', subsRes?.length || 0);
         setAllSubcategories(subsRes);
         setSubcategories(subsRes.slice(0, 6));   // initially show 6 subcategories
+        console.log('Set to display first 6 subcategories');
       } catch (error) {
         console.error('Failed to fetch home data:', error);
       } finally {

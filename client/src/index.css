@@ -1653,11 +1653,11 @@ select.form-control {
 }
 
 @media (max-width: 1024px) {
-  .categories-grid { grid-template-columns: repeat(3, 1fr); }
+  .categories-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .categories-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+  .categories-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
 }
 
 @media (max-width: 640px) {

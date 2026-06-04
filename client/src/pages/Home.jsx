@@ -55,9 +55,7 @@ const heroSlides = [
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSelling, setBestSelling] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);  // changed from categories
-  const [allSubcategories, setAllSubcategories] = useState([]);
-  const [expandedCategories, setExpandedCategories] = useState(false);
+  const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Slider state
@@ -76,11 +74,7 @@ const Home = () => {
 
         setFeaturedProducts(featuredRes.products || []);
         setBestSelling(bestRes.products || []);
-        console.log('API Response - subsRes:', subsRes);
-        console.log('Total subcategories from API:', subsRes?.length || 0);
-        setAllSubcategories(subsRes);
-        setSubcategories(subsRes.slice(0, 6));   // initially show 6 subcategories
-        console.log('Set to display first 6 subcategories');
+        setSubcategories(subsRes);   // Show all subcategories
       } catch (error) {
         console.error('Failed to fetch home data:', error);
       } finally {
@@ -89,16 +83,6 @@ const Home = () => {
     };
     fetchData();
   }, []);
-
-  const handleExpandCategories = () => {
-    if (expandedCategories) {
-      setSubcategories(allSubcategories.slice(0, 6));
-      setExpandedCategories(false);
-    } else {
-      setSubcategories(allSubcategories);
-      setExpandedCategories(true);
-    }
-  };
 
   // Auto‑slide logic
   useEffect(() => {
@@ -249,17 +233,6 @@ const Home = () => {
               </motion.div>
             ))}
           </motion.div>
-
-          {allSubcategories.length > 6 && (
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <button
-                onClick={handleExpandCategories}
-                className="btn btn-secondary"
-              >
-                {expandedCategories ? 'Show Less' : 'Show All Categories'} <ArrowRight size={16} />
-              </button>
-            </div>
-          )}
         </div>
       </motion.section>
 

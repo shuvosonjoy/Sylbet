@@ -56,7 +56,7 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
       console.log('Request headers:', req.headers);
       console.log('All files:', req.files);
     }
-    const image = req.file ? req.file.secure_url : '';
+    const image = req.file ? (req.file.path || req.file.secure_url) : '';
     const subcategory = new Subcategory({ name, description, category, image });
     const created = await subcategory.save();
     res.status(201).json(created);
@@ -77,7 +77,7 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
       subcategory.description = description !== undefined ? description : subcategory.description;
       subcategory.category = category || subcategory.category;
       if (req.file) {
-        subcategory.image = req.file.secure_url;
+        subcategory.image = req.file.path || req.file.secure_url;
         console.log('Image updated to:', subcategory.image);
       }
 

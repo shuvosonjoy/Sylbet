@@ -37,7 +37,7 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
     } else {
       console.log('NO FILE IN REQUEST');
     }
-    const image = req.file ? req.file.secure_url : '';
+    const image = req.file ? (req.file.path || req.file.secure_url) : '';
     const category = new Category({ name, description, image });
     const createdCategory = await category.save();
     res.status(201).json(createdCategory);
@@ -56,7 +56,7 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
       category.name = name || category.name;
       category.description = description !== undefined ? description : category.description;
       if (req.file) {
-        category.image = req.file.secure_url;
+        category.image = req.file.path || req.file.secure_url;
       }
 
       const updatedCategory = await category.save();

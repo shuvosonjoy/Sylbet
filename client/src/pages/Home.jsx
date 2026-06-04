@@ -56,7 +56,10 @@ const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSelling, setBestSelling] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [allSubcategories, setAllSubcategories] = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -69,12 +72,16 @@ const Home = () => {
         const [featuredRes, bestRes, subsRes] = await Promise.all([
           api.getProducts({ featured: true, limit: 4 }),
           api.getProducts({ bestSelling: true, limit: 4 }),
-          api.getSubcategories()   // fetch subcategories instead of categories
+          api.getSubcategories()
         ]);
 
         setFeaturedProducts(featuredRes.products || []);
         setBestSelling(bestRes.products || []);
-        setSubcategories(subsRes);   // Show all subcategories
+        setAllSubcategories(subsRes);
+
+        // Show 8 items on large screens (2 rows × 4 cols), 6 on mobile (3 rows × 2 cols)
+        const itemsToShow = windowWidth <= 768 ? 6 : 8;
+        setSubcategories(subsRes.slice(0, itemsToShow));
       } catch (error) {
         console.error('Failed to fetch home data:', error);
       } finally {
@@ -82,7 +89,27 @@ const Home = () => {
       }
     };
     fetchData();
+  }, [windowWidth]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const handleExpandCategories = () => {
+    if (expandedCategories) {
+      const itemsToShow = windowWidth <= 768 ? 6 : 8;
+      setSubcategories(allSubcategories.slice(0, itemsToShow));
+      setExpandedCategories(false);
+    } else {
+      setSubcategories(allSubcategories);
+      setExpandedCategories(true);
+    }
+  };
 
   // Auto‑slide logic
   useEffect(() => {
@@ -233,6 +260,17 @@ const Home = () => {
               </motion.div>
             ))}
           </motion.div>
+
+          {allSubcategories.length > (windowWidth <= 768 ? 6 : 8) && (
+            <div style={{ marginTop: '2.5rem', textAlign: 'center' }}>
+              <button
+                onClick={handleExpandCategories}
+                className="btn btn-secondary"
+              >
+                {expandedCategories ? 'Show Less' : 'View All Categories'} <ArrowRight size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </motion.section>
 

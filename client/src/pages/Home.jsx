@@ -82,6 +82,9 @@ const Home = () => {
         const featuredProducts = featuredRes.products || [];
         const bestSelling = bestRes.products || [];
 
+        console.log('[DEBUG] Best Selling products received from API:', bestSelling);
+        console.log('[DEBUG] Featured products received from API:', featuredProducts);
+
         setFeaturedProducts(featuredProducts);
         setBestSelling(bestSelling);
 
@@ -323,12 +326,21 @@ const Home = () => {
           {loading ? (
             <ProductGridSkeleton count={4} />
           ) : (
-            <motion.div className="grid grid-cols-4" variants={stagger}>
-              {bestSelling.map(product => (
-                <motion.div key={product._id} variants={fadeUp}>
-                  <ProductCard product={product} />
-                </motion.div>
-              ))}
+            <motion.div className="grid grid-cols-4" variants={stagger} layout>
+              {bestSelling.map((product, index) => {
+                console.log(`[DEBUG] Rendering Best Selling Product Card - Index: ${index}, ID: ${product._id}, Name: ${product.name}, Image URL: ${product.image}, Price: ${product.price}`);
+                return (
+                  <motion.div
+                    key={product._id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-50px' }}
+                    transition={{ duration: 0.5, delay: (index % 4) * 0.05 }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
 
@@ -358,12 +370,21 @@ const Home = () => {
           {loading ? (
             <ProductGridSkeleton count={4} />
           ) : (
-            <motion.div className="grid grid-cols-4" variants={stagger}>
-              {featuredProducts.map(product => (
-                <motion.div key={product._id} variants={fadeUp}>
-                  <ProductCard product={product} />
-                </motion.div>
-              ))}
+            <motion.div className="grid grid-cols-4" variants={stagger} layout>
+              {featuredProducts.map((product, index) => {
+                console.log(`[DEBUG] Rendering Featured Product Card - Index: ${index}, ID: ${product._id}, Name: ${product.name}, Image URL: ${product.image}, Price: ${product.price}`);
+                return (
+                  <motion.div
+                    key={product._id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-50px' }}
+                    transition={{ duration: 0.5, delay: (index % 4) * 0.05 }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
         </div>

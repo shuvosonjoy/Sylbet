@@ -8,6 +8,7 @@ import { showToast } from '../utils/toast';
 import PriceDisplay from './PriceDisplay';
 
 const ProductCard = ({ product }) => {
+  console.log(`[DEBUG] Render ProductCard - ID: ${product?._id}, Name: ${product?.name}, Price: ${product?.price}, Image: ${product?.image}`);
   const { addToCart } = useCart();
   const { isAuthenticated, token } = useAuth();
 
@@ -51,7 +52,23 @@ const ProductCard = ({ product }) => {
     <Link to={`/product/${product._id}`} className="card product-card card-hover">
       <div className="product-img-wrapper">
         {product.image ? (
-          <img src={product.image} alt={product.name} className="product-img" loading="lazy" />
+          <img 
+            src={product.image} 
+            alt={product.name} 
+            className="product-img" 
+            loading="lazy" 
+            onError={(e) => {
+              console.log(`[DEBUG] ProductCard Image load failed - URL: ${product.image}, fallback to placeholder`);
+              e.target.style.display = 'none';
+              const parent = e.target.parentElement;
+              const existing = parent.querySelector('.img-placeholder');
+              if (existing) existing.remove();
+              const fallback = document.createElement('div');
+              fallback.className = 'img-placeholder';
+              fallback.textContent = product.name.charAt(0);
+              parent.appendChild(fallback);
+            }}
+          />
         ) : (
           <div className="img-placeholder">
             {product.name.charAt(0)}

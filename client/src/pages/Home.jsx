@@ -19,7 +19,7 @@ const stagger = {
 const heroSlides = [
   {
     id: 1,
-    image: '/banner1.jpg',
+    image: '/sylbetbanner1.jpg',
     tag: 'Handcrafted with Love',
     title: 'Elevate Your Space with <span class="hero-highlight">Natural Cane</span> Elegance',
     subtitle: 'Discover our premium collection of handcrafted cane furniture — where timeless design meets sustainable artistry.',
@@ -198,7 +198,7 @@ const Home = () => {
                 <div className="hero-image-card">
                   <img
                     src={slide.image}
-                    alt="Sylbets Cane Furniture"
+                    alt="Sylbet"
                     className="hero-banner-image"
                   />
                 </div>

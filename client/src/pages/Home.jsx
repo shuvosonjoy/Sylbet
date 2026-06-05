@@ -19,7 +19,7 @@ const stagger = {
 const heroSlides = [
   {
     id: 1,
-    image: '/sylbetbanner1.jpg',
+    image: '/sylbet_banner1.jpg',
     tag: 'Handcrafted with Love',
     title: 'Elevate Your Space with <span class="hero-highlight">Natural Cane</span> Elegance',
     subtitle: 'Discover our premium collection of handcrafted cane furniture — where timeless design meets sustainable artistry.',
@@ -30,7 +30,7 @@ const heroSlides = [
   },
   {
     id: 2,
-    image: '/banner2.jpg',
+    image: '/sylbet_banner2.jpg',
     tag: 'Sustainable & Eco‑Friendly',
     title: 'Embrace Nature with <span class="hero-highlight">Eco‑Cane</span> Furniture',
     subtitle: 'Responsibly sourced materials, exquisite craftsmanship – a greener choice for your home.',
@@ -41,7 +41,7 @@ const heroSlides = [
   },
   {
     id: 3,
-    image: '/banner3.jpg',
+    image: '/sylbet_banner3.jpg',
     tag: 'Limited Edition',
     title: 'Artisanal <span class="hero-highlight">Masterpieces</span> Just for You',
     subtitle: 'Each piece tells a story of skilled hands and timeless design – truly one of a kind.',

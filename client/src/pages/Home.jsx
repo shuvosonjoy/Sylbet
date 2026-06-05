@@ -86,9 +86,14 @@ const Home = () => {
         setBestSelling(bestSelling);
 
         if (subsRes && subsRes.length > 0) {
+          console.log('[DEBUG] Category data received from API:', subsRes);
           setAllSubcategories(subsRes);
           const itemsToShow = getItemsToShow();
-          setSubcategories(subsRes.slice(0, itemsToShow));
+          const initialSubcategories = subsRes.slice(0, itemsToShow);
+          console.log('[DEBUG] Initial subcategories to render:', initialSubcategories);
+          setSubcategories(initialSubcategories);
+        } else {
+          console.log('[DEBUG] No subcategories received from API.');
         }
       } catch (error) {
         console.error('Failed to fetch home data:', error);
@@ -103,9 +108,12 @@ const Home = () => {
   const handleExpandCategories = () => {
     if (expandedCategories) {
       const itemsToShow = getItemsToShow();
-      setSubcategories(allSubcategories.slice(0, itemsToShow));
+      const collapsed = allSubcategories.slice(0, itemsToShow);
+      console.log('[DEBUG] "Show More" collapsed. Resetting subcategories to:', collapsed);
+      setSubcategories(collapsed);
       setExpandedCategories(false);
     } else {
+      console.log('[DEBUG] "Show More" expanded. Appended/All subcategories data:', allSubcategories);
       setSubcategories(allSubcategories);
       setExpandedCategories(true);
     }
@@ -234,45 +242,54 @@ const Home = () => {
           </motion.div>
 
           <motion.div className="categories-grid" variants={stagger} layout>
-            {subcategories.map((subcategory) => (
-              <motion.div key={subcategory._id} variants={fadeUp}>
-                <Link
-                  to={`/shop?subcategory=${subcategory._id}`}   // link directly to subcategory
-                  className="category-card"
+            {subcategories.map((subcategory, index) => {
+              console.log(`[DEBUG] Rendering Category Card - Index: ${index}, ID: ${subcategory._id}, Name: ${subcategory.name}, Image URL: ${subcategory.image}, Description: ${subcategory.description}`);
+              return (
+                <motion.div
+                  key={subcategory._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  transition={{ duration: 0.5, delay: (index % 4) * 0.05 }}
                 >
-                  <div className="category-card-icon" style={{ overflow: 'hidden', padding: 0 }}>
-                    {subcategory.image ? (
-                      <img
-                        src={subcategory.image}
-                        alt={subcategory.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          const parent = e.target.parentElement;
-                          const existing = parent.querySelector('.category-fallback');
-                          if (existing) existing.remove();
-                          const fallback = document.createElement('div');
-                          fallback.className = 'category-fallback';
-                          fallback.textContent = subcategory.name.charAt(0);
-                          parent.appendChild(fallback);
-                        }}
-                      />
-                    ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-primary-dark)', backgroundColor: 'linear-gradient(135deg, rgba(4,57,39,0.08), rgba(4,57,39,0.04))' }}>
-                        {subcategory.name.charAt(0)}
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="category-card-title">{subcategory.name}</h3>
-                  <p className="category-card-desc">
-                    {subcategory.description || 'Discover our beautiful collection'}
-                  </p>
-                  <span className="category-card-link">
-                    Explore <ArrowRight size={14} />
-                  </span>
-                </Link>
-              </motion.div>
-            ))}
+                  <Link
+                    to={`/shop?subcategory=${subcategory._id}`}   // link directly to subcategory
+                    className="category-card"
+                  >
+                    <div className="category-card-icon" style={{ overflow: 'hidden', padding: 0 }}>
+                      {subcategory.image ? (
+                        <img
+                          src={subcategory.image}
+                          alt={subcategory.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            const parent = e.target.parentElement;
+                            const existing = parent.querySelector('.category-fallback');
+                            if (existing) existing.remove();
+                            const fallback = document.createElement('div');
+                            fallback.className = 'category-fallback';
+                            fallback.textContent = subcategory.name.charAt(0);
+                            parent.appendChild(fallback);
+                          }}
+                        />
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-primary-dark)', backgroundColor: 'linear-gradient(135deg, rgba(4,57,39,0.08), rgba(4,57,39,0.04))' }}>
+                          {subcategory.name.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="category-card-title">{subcategory.name}</h3>
+                    <p className="category-card-desc">
+                      {subcategory.description || 'Discover our beautiful collection'}
+                    </p>
+                    <span className="category-card-link">
+                      Explore <ArrowRight size={14} />
+                    </span>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {allSubcategories.length > getItemsToShow() && (

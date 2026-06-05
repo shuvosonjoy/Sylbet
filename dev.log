@@ -64,3 +64,5 @@
 [0] 
 [0] Node.js v25.2.1
 [0] [31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[1] npm run client exited with code 1073807364
+[0] npm run server exited with code 1073807364

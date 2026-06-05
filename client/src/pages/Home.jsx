@@ -18,27 +18,27 @@ const stagger = {
 // Slider data – change images as needed
 const heroSlides = [
   {
-    id: 1,
-    image: '/sylbet_banner1.jpg',
-    tag: 'Handcrafted with Love',
-    title: 'Elevate Your Space with <span class="hero-highlight">Natural Cane</span> Elegance',
-    subtitle: 'Discover our premium collection of handcrafted cane furniture — where timeless design meets sustainable artistry.',
-    primaryLink: '/shop',
-    primaryText: 'Shop Collection',
-    secondaryLink: '/shop?featured=true',
-    secondaryText: 'Featured Pieces'
-  },
-  {
-    id: 2,
-    image: '/sylbet_banner2.jpg',
-    tag: 'Sustainable & Eco‑Friendly',
-    title: 'Embrace Nature with <span class="hero-highlight">Eco‑Cane</span> Furniture',
-    subtitle: 'Responsibly sourced materials, exquisite craftsmanship – a greener choice for your home.',
-    primaryLink: '/shop?eco=true',
-    primaryText: 'Explore Eco',
-    secondaryLink: '/shop',
-    secondaryText: 'All Products'
-  },
+  id: 1,
+  image: '/sylbet_banner1.jpg',
+  tag: 'Handcrafted with Love',
+  title: 'Discover <span class="hero-highlight">Natural Cane</span> Elegance',
+  subtitle: 'Timeless craftsmanship for modern homes.',
+  primaryLink: '/shop',
+  primaryText: 'Shop Collection',
+  secondaryLink: '/shop?featured=true',
+  secondaryText: 'Featured Pieces'
+},
+ {
+  id: 2,
+  image: '/sylbet_banner2.jpg',
+  tag: 'Sustainable & Eco-Friendly',
+  title: '<span class="hero-highlight">Eco-Cane</span> for Modern Living',
+  subtitle: 'Responsibly crafted furniture for a sustainable lifestyle.',
+  primaryLink: '/shop?eco=true',
+  primaryText: 'Explore Eco',
+  secondaryLink: '/shop',
+  secondaryText: 'All Products'
+},
   {
     id: 3,
     image: '/sylbet_banner3.jpg',

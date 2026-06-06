@@ -123,23 +123,29 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="container nav-container-wrapper">
-        
+
         {/* MOBILE LAYOUT HEADER */}
         <div className="nav-mobile-header">
-          <button 
-            className="nav-mobile-btn" 
+          <button
+            className="nav-mobile-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
-          
+
           <Link to="/" className="nav-logo-mobile">
-            <span className="logo-text">Sylbet</span>
-          </Link>
+            <img
+              src="/sylbet_logo_v1.png"
+              alt="Sylbet"
+              className="logo-image"
+            />
           
+            <span className="logo-text">SYLBET</span>
+          </Link>
+
           <div className="nav-mobile-actions">
-            <button 
+            <button
               className="nav-mobile-btn"
               onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
               aria-label="Toggle search"
@@ -196,8 +202,14 @@ const Navbar = () => {
 
           {/* 2. Center Section - Logo */}
           <div className="nav-center">
+            
             <Link to="/" className="nav-logo">
-              <span className="logo-text">Sylbet</span>
+             <img
+              src="/sylbet_logo_v1.png"
+              alt="Sylbet"
+              className="logo-image"
+            />
+              <span className="logo-text">SYLBET</span>
             </Link>
           </div>
 
@@ -333,7 +345,7 @@ const Navbar = () => {
               />
               <button type="submit" className="btn btn-primary btn-sm">Go</button>
             </form>
-            
+
             {searchQuery.trim().length >= 2 && (
               <div className="search-results-dropdown-mobile">
                 {searchResults.length > 0 ? (

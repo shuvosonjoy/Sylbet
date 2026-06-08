@@ -50,7 +50,6 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
   };
 
   const handleMouseEnter = () => {
-    // Only enable hover zoom on non-touch devices
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
       setIsZoomed(true);
     }
@@ -67,15 +66,12 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
       y: e.touches[0].clientY
     });
     
-    // Double tap to zoom
     const now = Date.now();
     if (now - lastTap < 300) {
       setIsZoomed(!isZoomed);
-      // Reset position on zoom out
       if (isZoomed) {
         setZoomPosition({ x: 50, y: 50 });
       } else {
-        // Simple center zoom for double tap
         setZoomPosition({ x: 50, y: 50 });
       }
     }
@@ -86,8 +82,7 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
     if (!touchStart) return;
 
     if (isZoomed && mainImageRef.current) {
-      // Pan image while zoomed
-      e.preventDefault(); // Prevent scrolling
+      e.preventDefault();
       const touchX = e.touches[0].clientX;
       const touchY = e.touches[0].clientY;
       
@@ -98,7 +93,6 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
       setZoomPosition(prev => {
         let newX = prev.x + (dx / width) * 100;
         let newY = prev.y + (dy / height) * 100;
-        // Clamp values between 0 and 100
         newX = Math.max(0, Math.min(100, newX));
         newY = Math.max(0, Math.min(100, newY));
         return { x: newX, y: newY };
@@ -108,13 +102,11 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
       return;
     }
 
-    // Swipe logic (only if not zoomed)
     const touchEndX = e.touches[0].clientX;
     const touchEndY = e.touches[0].clientY;
     const diffX = touchStart.x - touchEndX;
     const diffY = touchStart.y - touchEndY;
 
-    // Prevent scrolling while swiping horizontally
     if (Math.abs(diffX) > Math.abs(diffY)) {
       e.preventDefault();
     }
@@ -129,7 +121,6 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStart.x - touchEndX;
 
-    // Minimum swipe distance
     if (Math.abs(diff) > 50 && hasMultipleImages) {
       if (diff > 0) {
         handleNext();
@@ -153,25 +144,9 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
   const activeImage = safeImages[activeIndex];
 
   return (
-    <div className="product-gallery" ref={containerRef}>
-      {hasMultipleImages && (
-        <div className="gallery-thumbnails">
-          {safeImages.map((img, idx) => (
-            <button
-              key={idx}
-              className={`gallery-thumb ${idx === activeIndex ? 'active' : ''}`}
-              onClick={() => {
-                setActiveIndex(idx);
-                setIsZoomed(false);
-              }}
-              aria-label={`View image ${idx + 1}`}
-            >
-              <img src={img} alt={`${productName} thumbnail ${idx + 1}`} loading="lazy" />
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="product-gallery" ref={containerRef} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
+      {/* Main image on top */}
       <div className="gallery-main">
         {hasMultipleImages && (
           <>
@@ -187,7 +162,6 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
           </>
         )}
 
-        {/* Zoom hint icon (only show on desktop when hover is available, or mobile when not zoomed) */}
         {!isZoomed && (
           <div className="gallery-zoom-hint">
             <ZoomIn size={18} />
@@ -206,7 +180,7 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
           style={isZoomed ? {
             backgroundImage: `url(${activeImage})`,
             backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
-            backgroundSize: '250%' // 2.5x zoom
+            backgroundSize: '250%'
           } : {}}
         >
           <img
@@ -218,6 +192,36 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
           />
         </div>
       </div>
+
+      {/* Thumbnails below, horizontal row */}
+      {hasMultipleImages && (
+        <div
+          className="gallery-thumbnails"
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '8px',
+            overflowX: 'auto',
+            paddingBottom: '4px',
+          }}
+        >
+          {safeImages.map((img, idx) => (
+            <button
+              key={idx}
+              className={`gallery-thumb ${idx === activeIndex ? 'active' : ''}`}
+              onClick={() => {
+                setActiveIndex(idx);
+                setIsZoomed(false);
+              }}
+              aria-label={`View image ${idx + 1}`}
+              style={{ flexShrink: 0 }}
+            >
+              <img src={img} alt={`${productName} thumbnail ${idx + 1}`} loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 };

@@ -212,9 +212,9 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
                 setIsZoomed(false);
               }}
               aria-label={`View image ${idx + 1}`}
-              style={{ flex: 1, minWidth: 0 }}
+              style={{ flex: 1, minWidth: 0, height: '100px', padding: 0, overflow: 'hidden' }}
             >
-              <img src={img} alt={`${productName} thumbnail ${idx + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={img} alt={`${productName} thumbnail ${idx + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </button>
           ))}
         </div>

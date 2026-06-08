@@ -202,21 +202,38 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
             flexDirection: 'row',
             gap: '8px',
             overflowX: 'auto',
+            width: '100%',
           }}
         >
           {safeImages.map((img, idx) => (
-            <button
+            <div
               key={idx}
-              className={`gallery-thumb ${idx === activeIndex ? 'active' : ''}`}
               onClick={() => {
                 setActiveIndex(idx);
                 setIsZoomed(false);
               }}
+              style={{
+                flexShrink: 0,
+                width: 'calc(25% - 6px)',
+                height: '100px',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                borderRadius: 'var(--radius-md, 6px)',
+                border: idx === activeIndex ? '2px solid var(--color-primary, #000)' : '2px solid transparent',
+                boxSizing: 'border-box',
+              }}
               aria-label={`View image ${idx + 1}`}
-              style={{ flexShrink: 0, width: 'calc(25% - 6px)', height: '100px', padding: 0, overflow: 'hidden' }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setActiveIndex(idx)}
             >
-              <img src={img} alt={`${productName} thumbnail ${idx + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            </button>
+              <img
+                src={img}
+                alt={`${productName} thumbnail ${idx + 1}`}
+                loading="lazy"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </div>
           ))}
         </div>
       )}

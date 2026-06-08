@@ -201,8 +201,6 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
             display: 'flex',
             flexDirection: 'row',
             gap: '8px',
-            overflowX: 'auto',
-            paddingBottom: '4px',
           }}
         >
           {safeImages.map((img, idx) => (
@@ -214,9 +212,9 @@ const ProductImageGallery = ({ images = [], productName = 'Product' }) => {
                 setIsZoomed(false);
               }}
               aria-label={`View image ${idx + 1}`}
-              style={{ flexShrink: 0 }}
+              style={{ flex: 1, minWidth: 0 }}
             >
-              <img src={img} alt={`${productName} thumbnail ${idx + 1}`} loading="lazy" />
+              <img src={img} alt={`${productName} thumbnail ${idx + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </button>
           ))}
         </div>

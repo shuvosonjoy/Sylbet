@@ -75,7 +75,7 @@ router.post(
   '/',
   protect,
   admin,
-  upload.single('image'),
+  upload.array('images', 4),
   async (req, res) => {
     try {
       const {
@@ -90,6 +90,13 @@ router.post(
         bestSelling
       } = req.body;
 
+      let imageUrls = [];
+      if (req.files && req.files.length > 0) {
+        imageUrls = req.files.map(file => file.path || file.secure_url);
+      } else if (req.file) {
+        imageUrls = [req.file.path || req.file.secure_url];
+      }
+
       const product = new Product({
         name,
         price: Number(price),
@@ -97,10 +104,8 @@ router.post(
         description,
         category,
         subcategory: subcategory || null,
-
-        // 🔥 CLOUDINARY URL
-       image: req.file ? req.file.path || req.file.secure_url : '',
-
+        image: imageUrls[0] || '',
+        images: imageUrls,
         stock: Number(stock) || 0,
         featured: featured === 'true',
         bestSelling: bestSelling === 'true'
@@ -115,9 +120,9 @@ router.post(
   }
 );
 
-router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
+router.put('/:id', protect, admin, upload.array('images', 4), async (req, res) => {
   try {
-    const { name, price, discountPrice, description, category, subcategory, stock, featured, bestSelling } = req.body;
+    const { name, price, discountPrice, description, category, subcategory, stock, featured, bestSelling, existingImages } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (product) {
@@ -131,9 +136,29 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
       product.featured = featured !== undefined ? featured === 'true' : product.featured;
       product.bestSelling = bestSelling !== undefined ? bestSelling === 'true' : product.bestSelling;
 
-      if (req.file) {
-  product.image = req.file.path || req.file.secure_url;
-}
+      let keepImages = [];
+      if (existingImages !== undefined) {
+        try {
+          keepImages = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+          if (!Array.isArray(keepImages)) keepImages = [keepImages];
+        } catch {
+          keepImages = Array.isArray(existingImages) ? existingImages : [existingImages];
+        }
+      } else {
+        keepImages = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
+      }
+
+      let newImageUrls = [];
+      if (req.files && req.files.length > 0) {
+        newImageUrls = req.files.map(file => file.path || file.secure_url);
+      } else if (req.file) {
+        newImageUrls = [req.file.path || req.file.secure_url];
+      }
+
+      const allImages = [...keepImages, ...newImageUrls].filter(Boolean);
+
+      product.images = allImages.slice(0, 4);
+      product.image = product.images[0] || '';
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);

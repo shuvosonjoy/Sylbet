@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { showToast } from '../utils/toast';
 import PriceDisplay from '../components/PriceDisplay';
 import StockBadge from '../components/StockBadge';
+import ProductImageGallery from '../components/ProductImageGallery';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -122,15 +123,10 @@ const ProductDetail = () => {
 
       <div className="container section">
         <div className="product-detail-grid">
-          <div className="product-detail-img card">
-            {product.image ? (
-              <img src={product.image} alt={product.name} style={{ width: '100%', height: 'auto', display: 'block' }} />
-            ) : (
-              <div className="img-placeholder" style={{ minHeight: '400px', position: 'relative' }}>
-                {product.name.charAt(0)}
-              </div>
-            )}
-          </div>
+          <ProductImageGallery 
+            images={product.images || (product.image ? [product.image] : [])} 
+            productName={product.name} 
+          />
 
           <div className="product-detail-info">
             <div className="product-detail-meta">

@@ -23,7 +23,7 @@ const AdminDashboard = () => {
   // Form States
   const [productForm, setProductForm] = useState({
     name: '', price: '', discountPrice: '', description: '',
-    category: '', subcategory: '', stock: '', featured: false, bestSelling: false, image: null,
+    category: '', subcategory: '', stock: '', featured: false, bestSelling: false, images: [], existingImages: [],
   });
 
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '', image: null });
@@ -100,13 +100,13 @@ const AdminDashboard = () => {
           name: item.name || '', price: item.price || '', discountPrice: item.discountPrice || '',
           description: item.description || '', category: item.category?._id || '',
           subcategory: item.subcategory?._id || '', stock: item.stock || 0,
-          featured: item.featured || false, bestSelling: item.bestSelling || false, image: null,
+          featured: item.featured || false, bestSelling: item.bestSelling || false, images: [], existingImages: item.images || (item.image ? [item.image] : []),
         });
       } else {
         setProductForm({
           name: '', price: '', discountPrice: '', description: '',
           category: categories[0]?._id || '', subcategory: '', stock: 0,
-          featured: false, bestSelling: false, image: null,
+          featured: false, bestSelling: false, images: [], existingImages: [],
         });
       }
     }
@@ -148,7 +148,16 @@ const AdminDashboard = () => {
     formData.append('stock', productForm.stock);
     formData.append('featured', productForm.featured);
     formData.append('bestSelling', productForm.bestSelling);
-    if (productForm.image) formData.append('image', productForm.image);
+    
+    if (modalMode === 'edit') {
+      formData.append('existingImages', JSON.stringify(productForm.existingImages));
+    }
+
+    if (productForm.images && productForm.images.length > 0) {
+      productForm.images.forEach(img => {
+        formData.append('images', img);
+      });
+    }
 
     try {
       if (modalMode === 'add') {
@@ -488,9 +497,30 @@ const AdminDashboard = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Product Image</label>
-            <input type="file" className="form-control" accept="image/*"
-              onChange={(e) => setProductForm({ ...productForm, image: e.target.files?.[0] || null })} />
+            <label className="form-label">Product Images (Max 4)</label>
+            <input type="file" className="form-control" accept="image/*" multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files).slice(0, 4); // Max 4 new images
+                setProductForm({ ...productForm, images: files });
+              }} />
+            
+            {modalMode === 'edit' && productForm.existingImages?.length > 0 && (
+              <div className="existing-images-preview mt-2" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                {productForm.existingImages.map((img, idx) => (
+                  <div key={idx} style={{ position: 'relative' }}>
+                    <img src={img} alt={`Preview ${idx}`} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--color-border)' }} />
+                    <button type="button" 
+                      style={{ position: 'absolute', top: '-6px', right: '-6px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => {
+                        const newExisting = [...productForm.existingImages];
+                        newExisting.splice(idx, 1);
+                        setProductForm({ ...productForm, existingImages: newExisting });
+                      }}
+                    >✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="form-group" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>

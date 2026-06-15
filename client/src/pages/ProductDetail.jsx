@@ -8,6 +8,7 @@ import { showToast } from '../utils/toast';
 import PriceDisplay from '../components/PriceDisplay';
 import StockBadge from '../components/StockBadge';
 import ProductImageGallery from '../components/ProductImageGallery';
+import ProductDescription from '../components/ProductDescription';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -173,8 +174,7 @@ const ProductDetail = () => {
             <StockBadge stock={product.stock} />
 
             <div className="product-detail-desc">
-              <h3>Description</h3>
-              <p>{product.description}</p>
+              <ProductDescription description={product.description} />
             </div>
 
             {!isOutOfStock && (

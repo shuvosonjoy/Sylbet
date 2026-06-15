@@ -532,8 +532,17 @@ const AdminDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">Description</label>
-            <textarea className="form-control" value={productForm.description}
-              onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} required />
+            <textarea
+              className="form-control"
+              rows={12}
+              value={productForm.description}
+              onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+              placeholder={`Use bracketed markers to add structured sections (optional):\n\n[FEATURES]\nPremium Burma Cane\nHandmade Construction\n\n[DESCRIPTION]\nBeautiful handcrafted cane chair...\n\n[MATERIALS]\nBurma Cane\nFoam Cushion\n\n[DIMENSIONS]\nSeat Height: 16-18 inches\n\n[DELIVERY]\nEstimated Delivery: 5-6 Days\n\n[NOTES]\nCustomization available.`}
+              required
+            />
+            <small className="text-muted" style={{ display: 'block', marginTop: '6px', fontSize: '0.8rem' }}>
+              Tip: wrap content with <code>[FEATURES]</code>, <code>[DESCRIPTION]</code>, <code>[MATERIALS]</code>, <code>[DIMENSIONS]</code>, <code>[DELIVERY]</code>, <code>[NOTES]</code> on their own lines. Plain text without markers still works.
+            </small>
           </div>
 
           <div className="form-group">

@@ -3,16 +3,19 @@ const router = express.Router();
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { protect, admin, optionalAuth } = require('../middleware/auth');
+const { computeOrderTotals, getEffectiveUnitPrice } = require('../utils/pricing');
 
 router.post('/', optionalAuth, async (req, res) => {
   try {
-    const { customerName, email, phone, address, bkashTransactionId, items, totalAmount } = req.body;
+    const { customerName, email, phone, address, bkashTransactionId, items } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: 'No order items' });
     }
 
-    // Validate stock for each item
+    // Hydrate items from the database. We never trust client-supplied prices or
+    // delivery charges — the canonical values come from the Product collection.
+    const hydratedItems = [];
     for (const item of items) {
       const product = await Product.findById(item.product);
       if (!product) {
@@ -23,14 +26,31 @@ router.post('/', optionalAuth, async (req, res) => {
           message: `Insufficient stock for "${product.name}". Available: ${product.stock}, Requested: ${item.quantity}`
         });
       }
+
+      // Snapshot price + delivery charge at purchase time so historical orders
+      // are immutable against future product edits.
+      const unitPrice = getEffectiveUnitPrice({
+        price: product.price,
+        discountPrice: product.discountPrice
+      });
+
+      hydratedItems.push({
+        product: product._id,
+        name: product.name,
+        quantity: Number(item.quantity),
+        price: unitPrice,
+        deliveryCharge: Number(product.deliveryCharge) || 0
+      });
     }
 
-    // Decrement stock for each item
-    for (const item of items) {
+    // Decrement stock for each item (after validation passes for all items).
+    for (const item of hydratedItems) {
       await Product.findByIdAndUpdate(item.product, {
         $inc: { stock: -item.quantity }
       });
     }
+
+    const totals = computeOrderTotals(hydratedItems);
 
     const order = new Order({
       user: req.user ? req.user._id : null,
@@ -39,8 +59,10 @@ router.post('/', optionalAuth, async (req, res) => {
       phone,
       address,
       bkashTransactionId,
-      items,
-      totalAmount
+      items: hydratedItems,
+      subtotal: totals.subtotal,
+      deliveryChargeTotal: totals.deliveryChargeTotal,
+      totalAmount: totals.totalAmount
     });
 
     const createdOrder = await order.save();

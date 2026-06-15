@@ -144,6 +144,32 @@ const ProductDetail = () => {
 
             <PriceDisplay price={product.price} discountPrice={product.discountPrice} size="lg" />
 
+            {/* Delivery charge breakdown — shown for every product, including the
+                "free delivery" case where deliveryCharge is 0. */}
+            <div className="product-delivery-info" style={{ marginTop: 'var(--space-md)', padding: 'var(--space-md)', background: 'var(--color-bg-alt, #f9f9f9)', borderRadius: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}>
+                <span className="text-muted">Product Price</span>
+                <span>৳{Number(product.discountPrice && product.discountPrice < product.price ? product.discountPrice : product.price).toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', marginTop: '4px' }}>
+                <span className="text-muted">Delivery Charge</span>
+                <span>
+                  {Number(product.deliveryCharge) > 0
+                    ? `৳${Number(product.deliveryCharge).toLocaleString()}`
+                    : <span style={{ color: 'var(--color-success)' }}>Free</span>}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed var(--color-border)' }}>
+                <span>Total Payable</span>
+                <span className="text-accent">
+                  ৳{(
+                    Number(product.discountPrice && product.discountPrice < product.price ? product.discountPrice : product.price) +
+                    Number(product.deliveryCharge || 0)
+                  ).toLocaleString()}
+                </span>
+              </div>
+            </div>
+
             <StockBadge stock={product.stock} />
 
             <div className="product-detail-desc">

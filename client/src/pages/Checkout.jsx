@@ -6,7 +6,7 @@ import { api } from '../utils/api';
 import { showToast } from '../utils/toast';
 
 const Checkout = () => {
-  const { cartItems, cartTotal, clearCart, getEffectivePrice } = useCart();
+  const { cartItems, cartSubtotal, cartDeliveryCharge, cartTotal, clearCart, getEffectivePrice } = useCart();
   const { user, isAuthenticated, token } = useAuth();
   const navigate = useNavigate();
 
@@ -44,21 +44,29 @@ const Checkout = () => {
     setLoading(true);
 
     try {
+      // Server is the source of truth: it ignores client-supplied prices and
+      // delivery charges, looking each one up from the Product collection.
+      // We still send what we displayed so support can debug discrepancies.
       const orderData = {
         ...formData,
         items: cartItems.map(item => ({
           product: item._id,
           name: item.name,
           quantity: item.quantity,
-          price: getEffectivePrice(item)
+          price: getEffectivePrice(item),
+          deliveryCharge: Number(item.deliveryCharge) || 0
         })),
+        subtotal: cartSubtotal,
+        deliveryChargeTotal: cartDeliveryCharge,
         totalAmount: cartTotal
       };
 
-      await api.createOrder(orderData, token);
+      const created = await api.createOrder(orderData, token);
       clearCart();
       showToast.success('Order placed successfully!');
-      navigate('/order-success');
+      // Pass the persisted (server-computed) order to the success page so the
+      // invoice reflects authoritative numbers, not whatever the client guessed.
+      navigate('/order-success', { state: { order: created } });
     } catch (err) {
       showToast.error(err.message || 'Failed to place order. Please try again.');
     } finally {
@@ -130,7 +138,7 @@ const Checkout = () => {
               <p style={{ marginBottom: 'var(--space-sm)' }}>
                 Please Send Money via bKash to our personal number: <strong>01XXXXXXXXX</strong>
               </p>
-              <p>Amount to send: <strong>৳{cartTotal.toLocaleString()}</strong></p>
+              <p>Amount to send: <strong>৳{cartTotal.toLocaleString()}</strong> <span className="text-muted">(includes ৳{cartDeliveryCharge.toLocaleString()} delivery)</span></p>
             </div>
 
             <div className="form-group">
@@ -177,8 +185,20 @@ const Checkout = () => {
               })}
             </div>
 
+            <div className="summary-row">
+              <span className="text-muted">Subtotal</span>
+              <span className="font-medium">৳{cartSubtotal.toLocaleString()}</span>
+            </div>
+            <div className="summary-row">
+              <span className="text-muted">Delivery Charge</span>
+              <span className="font-medium">
+                {cartDeliveryCharge > 0
+                  ? `৳${cartDeliveryCharge.toLocaleString()}`
+                  : <span style={{ color: 'var(--color-success)' }}>Free</span>}
+              </span>
+            </div>
             <div className="summary-row summary-total">
-              <span>Total Amount</span>
+              <span>Total Payable</span>
               <span className="text-accent">৳{cartTotal.toLocaleString()}</span>
             </div>
           </div>

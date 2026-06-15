@@ -86,9 +86,20 @@ router.post(
         category,
         subcategory,
         stock,
+        deliveryCharge,
         featured,
         bestSelling
       } = req.body;
+
+      // Delivery charge is required for new products. Reject missing, non-numeric,
+      // or negative values explicitly so the admin gets a clear error.
+      if (deliveryCharge === undefined || deliveryCharge === null || deliveryCharge === '') {
+        return res.status(400).json({ message: 'Delivery charge is required' });
+      }
+      const parsedDeliveryCharge = Number(deliveryCharge);
+      if (Number.isNaN(parsedDeliveryCharge) || parsedDeliveryCharge < 0) {
+        return res.status(400).json({ message: 'Delivery charge must be a non-negative number' });
+      }
 
       let imageUrls = [];
       if (req.files && req.files.length > 0) {
@@ -107,6 +118,7 @@ router.post(
         image: imageUrls[0] || '',
         images: imageUrls,
         stock: Number(stock) || 0,
+        deliveryCharge: parsedDeliveryCharge,
         featured: featured === 'true',
         bestSelling: bestSelling === 'true'
       });
@@ -122,7 +134,7 @@ router.post(
 
 router.put('/:id', protect, admin, upload.array('images', 4), async (req, res) => {
   try {
-    const { name, price, discountPrice, description, category, subcategory, stock, featured, bestSelling, existingImages } = req.body;
+    const { name, price, discountPrice, description, category, subcategory, stock, deliveryCharge, featured, bestSelling, existingImages } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (product) {
@@ -133,6 +145,16 @@ router.put('/:id', protect, admin, upload.array('images', 4), async (req, res) =
       product.category = category || product.category;
       product.subcategory = subcategory !== undefined ? (subcategory || null) : product.subcategory;
       product.stock = stock !== undefined ? Number(stock) : product.stock;
+
+      // Optional on update: only validate/assign if the admin provided a value.
+      if (deliveryCharge !== undefined && deliveryCharge !== '') {
+        const parsedDeliveryCharge = Number(deliveryCharge);
+        if (Number.isNaN(parsedDeliveryCharge) || parsedDeliveryCharge < 0) {
+          return res.status(400).json({ message: 'Delivery charge must be a non-negative number' });
+        }
+        product.deliveryCharge = parsedDeliveryCharge;
+      }
+
       product.featured = featured !== undefined ? featured === 'true' : product.featured;
       product.bestSelling = bestSelling !== undefined ? bestSelling === 'true' : product.bestSelling;
 

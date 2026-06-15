@@ -23,7 +23,8 @@ const AdminDashboard = () => {
   // Form States
   const [productForm, setProductForm] = useState({
     name: '', price: '', discountPrice: '', description: '',
-    category: '', subcategory: '', stock: '', featured: false, bestSelling: false, images: [], existingImages: [],
+    category: '', subcategory: '', stock: '', deliveryCharge: '',
+    featured: false, bestSelling: false, images: [], existingImages: [],
   });
 
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '', image: null });
@@ -100,12 +101,14 @@ const AdminDashboard = () => {
           name: item.name || '', price: item.price || '', discountPrice: item.discountPrice || '',
           description: item.description || '', category: item.category?._id || '',
           subcategory: item.subcategory?._id || '', stock: item.stock || 0,
+          deliveryCharge: item.deliveryCharge != null ? item.deliveryCharge : '',
           featured: item.featured || false, bestSelling: item.bestSelling || false, images: [], existingImages: item.images || (item.image ? [item.image] : []),
         });
       } else {
         setProductForm({
           name: '', price: '', discountPrice: '', description: '',
           category: categories[0]?._id || '', subcategory: '', stock: 0,
+          deliveryCharge: '',
           featured: false, bestSelling: false, images: [], existingImages: [],
         });
       }
@@ -138,6 +141,22 @@ const AdminDashboard = () => {
   // Product Submit
   const handleProductSubmit = async (e) => {
     e.preventDefault();
+
+    // Client-side guard mirroring the server validator. Required on create,
+    // optional on edit (empty string means "leave existing value").
+    const dc = productForm.deliveryCharge;
+    if (modalMode === 'add' && (dc === '' || dc === null || dc === undefined)) {
+      showToast.error('Delivery charge is required');
+      return;
+    }
+    if (dc !== '' && dc !== null && dc !== undefined) {
+      const parsed = Number(dc);
+      if (Number.isNaN(parsed) || parsed < 0) {
+        showToast.error('Delivery charge must be a non-negative number');
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append('name', productForm.name);
     formData.append('price', productForm.price);
@@ -146,6 +165,9 @@ const AdminDashboard = () => {
     formData.append('category', productForm.category);
     if (productForm.subcategory) formData.append('subcategory', productForm.subcategory);
     formData.append('stock', productForm.stock);
+    if (dc !== '' && dc !== null && dc !== undefined) {
+      formData.append('deliveryCharge', dc);
+    }
     formData.append('featured', productForm.featured);
     formData.append('bestSelling', productForm.bestSelling);
     
@@ -285,6 +307,7 @@ const AdminDashboard = () => {
                   <th>Category</th>
                   <th>Price</th>
                   <th>Discount</th>
+                  <th>Delivery</th>
                   <th>Stock</th>
                   <th>Featured</th>
                   <th>Actions</th>
@@ -305,6 +328,7 @@ const AdminDashboard = () => {
                     </td>
                     <td>৳{Number(item.price || 0).toLocaleString()}</td>
                     <td>{item.discountPrice ? <span style={{ color: 'var(--color-danger)' }}>৳{Number(item.discountPrice).toLocaleString()}</span> : '—'}</td>
+                    <td>৳{Number(item.deliveryCharge || 0).toLocaleString()}</td>
                     <td>
                       <span className={`stock-indicator ${item.stock <= 0 ? 'stock-out' : item.stock <= 5 ? 'stock-low' : 'stock-in'}`}>
                         {item.stock || 0}
@@ -394,7 +418,7 @@ const AdminDashboard = () => {
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>bKash TxID</th><th>Status</th><th>Actions</th>
+                  <th>Date</th><th>Customer</th><th>Items</th><th>Subtotal</th><th>Delivery</th><th>Total</th><th>bKash TxID</th><th>Status</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -411,6 +435,8 @@ const AdminDashboard = () => {
                         <div key={idx} className="text-sm">{it.name} x{it.quantity}</div>
                       ))}
                     </td>
+                    <td>৳{Number(item.subtotal || 0).toLocaleString()}</td>
+                    <td>৳{Number(item.deliveryChargeTotal || 0).toLocaleString()}</td>
                     <td className="font-medium">৳{Number(item.totalAmount || 0).toLocaleString()}</td>
                     <td>{item.bkashTransactionId || 'N/A'}</td>
                     <td><span className={`status-badge status-${item.status}`}>{item.status || 'Pending'}</span></td>
@@ -470,13 +496,27 @@ const AdminDashboard = () => {
                 onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Category</label>
-              <select className="form-control" value={productForm.category}
-                onChange={(e) => setProductForm({ ...productForm, category: e.target.value, subcategory: '' })} required>
-                <option value="">Select Category</option>
-                {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
-              </select>
+              <label className="form-label">Delivery Charge (৳) *</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className="form-control"
+                value={productForm.deliveryCharge}
+                onChange={(e) => setProductForm({ ...productForm, deliveryCharge: e.target.value })}
+                placeholder="e.g. 60 (use 0 for free delivery)"
+                required
+              />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Category</label>
+            <select className="form-control" value={productForm.category}
+              onChange={(e) => setProductForm({ ...productForm, category: e.target.value, subcategory: '' })} required>
+              <option value="">Select Category</option>
+              {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+            </select>
           </div>
 
           {filteredSubcategories.length > 0 && (

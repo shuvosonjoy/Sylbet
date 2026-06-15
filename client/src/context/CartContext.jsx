@@ -1,12 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { getEffectiveUnitPrice, computeDeliveryChargeTotal, computeSubtotal } from '../utils/pricing';
 
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
-
-const getEffectivePrice = (item) => {
-  return item.discountPrice && item.discountPrice < item.price ? item.discountPrice : item.price;
-};
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
@@ -33,7 +30,9 @@ export const CartProvider = ({ children }) => {
         );
       }
       if (quantity > product.stock) return prevItems;
-      return [...prevItems, { ...product, quantity }];
+      // Persist deliveryCharge alongside the cart item so cart math survives
+      // a page reload even if the product is later edited.
+      return [...prevItems, { ...product, quantity, deliveryCharge: Number(product.deliveryCharge) || 0 }];
     });
     return true;
   };
@@ -62,8 +61,12 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
-  const cartTotal = cartItems.reduce((total, item) => total + (getEffectivePrice(item) * item.quantity), 0);
+  const cartSubtotal = computeSubtotal(cartItems);
+  const cartDeliveryCharge = computeDeliveryChargeTotal(cartItems);
+  const cartTotal = cartSubtotal + cartDeliveryCharge;
   const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+
+  const getEffectivePrice = getEffectiveUnitPrice;
 
   return (
     <CartContext.Provider value={{
@@ -72,6 +75,8 @@ export const CartProvider = ({ children }) => {
       removeFromCart,
       updateQuantity,
       clearCart,
+      cartSubtotal,
+      cartDeliveryCharge,
       cartTotal,
       cartCount,
       getEffectivePrice

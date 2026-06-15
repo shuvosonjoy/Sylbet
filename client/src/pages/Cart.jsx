@@ -6,7 +6,7 @@ import { showToast } from '../utils/toast';
 import PriceDisplay from '../components/PriceDisplay';
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, cartTotal, getEffectivePrice } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, cartSubtotal, cartDeliveryCharge, cartTotal, getEffectivePrice } = useCart();
   const navigate = useNavigate();
 
   const handleRemove = (id) => {
@@ -89,14 +89,18 @@ const Cart = () => {
             <h3 style={{ marginBottom: 'var(--space-md)' }}>Order Summary</h3>
             <div className="summary-row">
               <span className="text-muted">Subtotal ({cartItems.reduce((c, i) => c + i.quantity, 0)} items)</span>
-              <span className="font-medium">৳{cartTotal.toLocaleString()}</span>
+              <span className="font-medium">৳{cartSubtotal.toLocaleString()}</span>
             </div>
             <div className="summary-row">
-              <span className="text-muted">Shipping</span>
-              <span className="font-medium" style={{ color: 'var(--color-success)' }}>Calculated at Checkout</span>
+              <span className="text-muted">Delivery Charge</span>
+              <span className="font-medium">
+                {cartDeliveryCharge > 0
+                  ? `৳${cartDeliveryCharge.toLocaleString()}`
+                  : <span style={{ color: 'var(--color-success)' }}>Free</span>}
+              </span>
             </div>
             <div className="summary-row summary-total">
-              <span>Total</span>
+              <span>Grand Total</span>
               <span>৳{cartTotal.toLocaleString()}</span>
             </div>
             <button

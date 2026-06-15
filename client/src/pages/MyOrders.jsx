@@ -69,9 +69,25 @@ const MyOrders = () => {
                   </div>
                 ))}
               </div>
-              <div className="order-card-footer">
-                <span className="text-muted">Total Amount</span>
-                <span className="font-medium text-primary-dark" style={{ fontSize: '1.125rem' }}>৳{Number(order.totalAmount || 0).toLocaleString()}</span>
+              <div className="order-card-footer" style={{ display: 'block' }}>
+                {/* Show breakdown when the order has the new fields. Older orders
+                    that pre-date this feature only have totalAmount. */}
+                {(order.subtotal != null || order.deliveryChargeTotal != null) && (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                      <span className="text-muted">Subtotal</span>
+                      <span>৳{Number(order.subtotal || 0).toLocaleString()}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginTop: '4px' }}>
+                      <span className="text-muted">Delivery Charge</span>
+                      <span>৳{Number(order.deliveryChargeTotal || 0).toLocaleString()}</span>
+                    </div>
+                  </>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--color-border)' }}>
+                  <span className="text-muted">Total Amount</span>
+                  <span className="font-medium text-primary-dark" style={{ fontSize: '1.125rem' }}>৳{Number(order.totalAmount || 0).toLocaleString()}</span>
+                </div>
               </div>
             </div>
           ))}

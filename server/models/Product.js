@@ -10,6 +10,14 @@ const productSchema = mongoose.Schema({
   image: { type: String, default: '' },
   images: [{ type: String }],
   stock: { type: Number, default: 0 },
+  // Per-product delivery charge in BDT. Required at the application layer for new
+  // products (admin form), but defaulted to 0 so existing documents keep working
+  // without a migration. Validator rejects negatives.
+  deliveryCharge: {
+    type: Number,
+    default: 0,
+    min: [0, 'Delivery charge cannot be negative']
+  },
   featured: { type: Boolean, default: false },
   bestSelling: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
@@ -24,6 +32,8 @@ productSchema.set('toJSON', {
     if (ret.images && ret.images.length > 0 && !ret.image) {
       ret.image = ret.images[0];
     }
+    // Ensure legacy products without the field still surface a numeric value to clients.
+    if (ret.deliveryCharge == null) ret.deliveryCharge = 0;
     return ret;
   }
 });

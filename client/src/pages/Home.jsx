@@ -161,7 +161,7 @@ const Home = () => {
         onMouseEnter={() => setIsAutoPlaying(false)}
         onMouseLeave={() => setIsAutoPlaying(true)}
       >
-        <div className="hero-bg-pattern"></div>
+        <div className="hero-bg-pattern" aria-hidden="true"></div>
         {heroSlides.map((slide, index) => (
           <div
             key={slide.id}

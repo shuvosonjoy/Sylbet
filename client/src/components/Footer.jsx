@@ -5,6 +5,7 @@ import { MapPin, Phone, Mail } from 'lucide-react';
 const Footer = () => {
   return (
     <footer className="footer">
+      <div className="footer-bg-pattern" aria-hidden="true"></div>
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">

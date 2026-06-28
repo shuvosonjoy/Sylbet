@@ -244,5 +244,54 @@ export const api = {
       body: formData
     });
     return handleResponse(res);
+  },
+
+  // Reviews
+  getReviews: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/reviews${query ? `?${query}` : ''}`);
+    return handleResponse(res);
+  },
+
+  getAdminReviews: async (token) => {
+    const res = await fetch(`${API_BASE}/reviews/admin`, {
+      headers: getHeaders(token)
+    });
+    return handleResponse(res);
+  },
+
+  createReview: async (formData, token) => {
+    const res = await fetch(`${API_BASE}/reviews`, {
+      method: 'POST',
+      headers: getHeaders(token, true),
+      body: formData
+    });
+    return handleResponse(res);
+  },
+
+  updateReview: async (id, formData, token) => {
+    const res = await fetch(`${API_BASE}/reviews/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(token, true),
+      body: formData
+    });
+    return handleResponse(res);
+  },
+
+  deleteReview: async (id, token) => {
+    const res = await fetch(`${API_BASE}/reviews/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(token)
+    });
+    return handleResponse(res);
+  },
+
+  reorderReviews: async (orders, token) => {
+    const res = await fetch(`${API_BASE}/reviews/reorder`, {
+      method: 'PUT',
+      headers: getHeaders(token),
+      body: JSON.stringify({ orders })
+    });
+    return handleResponse(res);
   }
 };

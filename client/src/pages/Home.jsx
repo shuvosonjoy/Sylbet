@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Truck, Shield, Leaf, Star, ArrowRight } from
 import { api } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { ProductGridSkeleton } from '../components/Skeleton';
+import ImageLightbox from '../components/ImageLightbox';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -47,6 +48,18 @@ const Home = () => {
   const [allSubcategories, setAllSubcategories] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState([]);
+
+  // Lightbox state
+  const [lightbox, setLightbox] = useState({ open: false, images: [], index: 0 });
+
+  const openLightbox = (images, index = 0) => {
+    setLightbox({ open: true, images, index });
+  };
+
+  const closeLightbox = () => {
+    setLightbox({ open: false, images: [], index: 0 });
+  };
 
   // Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -61,10 +74,11 @@ const Home = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [featuredRes, bestRes, subsRes] = await Promise.all([
+        const [featuredRes, bestRes, subsRes, reviewsRes] = await Promise.all([
           api.getProducts({ featured: true, limit: 4 }),
           api.getProducts({ bestSelling: true, limit: 4 }),
-          api.getSubcategories()
+          api.getSubcategories(),
+          api.getReviews()
         ]);
 
         const featuredProducts = featuredRes.products || [];
@@ -75,6 +89,7 @@ const Home = () => {
 
         setFeaturedProducts(featuredProducts);
         setBestSelling(bestSelling);
+        setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
 
         if (subsRes && subsRes.length > 0) {
           console.log('[DEBUG] Category data received from API:', subsRes);
@@ -401,7 +416,8 @@ const Home = () => {
         </div>
       </motion.section>
 
-      {/* Testimonials */}
+      {/* Customer Reviews */}
+      {reviews.length > 0 && (
       <motion.section
         className="section section-light"
         initial="hidden"
@@ -416,24 +432,61 @@ const Home = () => {
           </motion.div>
 
           <motion.div className="testimonials-grid" variants={stagger}>
-            {[
-              { name: 'Fatima Rahman', text: 'The cane lounge chair is absolutely stunning. The craftsmanship is exceptional and it fits perfectly in my living room.', rating: 5 },
-              { name: 'Arif Hossain', text: 'Ordered the pendant light and coffee table. Both arrived in perfect condition. Amazing quality for the price!', rating: 5 },
-              { name: 'Nusrat Jahan', text: 'Love the eco-friendly approach. The baskets are beautiful and very functional. Will definitely order again.', rating: 4 }
-            ].map((review, i) => (
-              <motion.div key={i} className="testimonial-card" variants={fadeUp}>
+            {reviews.map((review, i) => (
+              <motion.div key={review._id} className={`testimonial-card ${review.featured ? 'testimonial-featured' : ''}`} variants={fadeUp}>
                 <div className="testimonial-stars">
                   {Array.from({ length: review.rating }).map((_, j) => (
                     <Star key={j} size={16} fill="currentColor" />
                   ))}
+                  {Array.from({ length: 5 - review.rating }).map((_, j) => (
+                    <Star key={`empty-${j}`} size={16} />
+                  ))}
                 </div>
                 <p className="testimonial-text">"{review.text}"</p>
-                <p className="testimonial-author">{review.name}</p>
+
+                {review.images && review.images.length > 0 && (
+                  <div className="testimonial-images">
+                    {review.images.map((img, imgIdx) => (
+                      <button
+                        key={imgIdx}
+                        className="testimonial-image-thumb"
+                        onClick={() => openLightbox(review.images, imgIdx)}
+                        type="button"
+                      >
+                        <img src={img} alt={`Review by ${review.customerName}`} loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="testimonial-author-info">
+                  <p className="testimonial-author">{review.customerName}</p>
+                  {review.location && (
+                    <p className="testimonial-location">{review.location}</p>
+                  )}
+                </div>
+
+                {review.product?.name && (
+                  <Link to={`/product/${review.product._id}`} className="testimonial-product-ref">
+                    {review.product.name}
+                  </Link>
+                )}
               </motion.div>
             ))}
           </motion.div>
         </div>
       </motion.section>
+      )}
+
+      {lightbox.open && (
+        <ImageLightbox
+          images={lightbox.images}
+          currentIndex={lightbox.index}
+          onClose={closeLightbox}
+          onPrev={lightbox.index > 0 ? () => setLightbox(prev => ({ ...prev, index: prev.index - 1 })) : null}
+          onNext={lightbox.index < lightbox.images.length - 1 ? () => setLightbox(prev => ({ ...prev, index: prev.index + 1 })) : null}
+        />
+      )}
     </div>
   );
 };

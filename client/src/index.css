@@ -1996,6 +1996,183 @@ select.form-control {
   color: var(--color-primary-dark);
 }
 
+.testimonial-author-info {
+  margin-top: auto;
+}
+
+.testimonial-location {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.testimonial-featured {
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent-rgb, 183, 143, 62), 0.1);
+  position: relative;
+}
+
+.testimonial-featured::before {
+  content: '\2605';
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  color: var(--color-accent);
+  font-size: 1rem;
+}
+
+.testimonial-images {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.testimonial-image-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 0;
+  background: none;
+  transition: border-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.testimonial-image-thumb:hover {
+  border-color: var(--color-primary);
+}
+
+.testimonial-image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.testimonial-product-ref {
+  display: inline-block;
+  margin-top: var(--space-sm);
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-light);
+  transition: background var(--transition-fast);
+}
+
+.testimonial-product-ref:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ====================== */
+/* Image Lightbox         */
+/* ====================== */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  z-index: 10001;
+  padding: var(--space-sm);
+  border-radius: 50%;
+  transition: background var(--transition-fast);
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+  cursor: default;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
+.lightbox-counter {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: var(--space-sm);
+  font-size: 0.875rem;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: var(--space-md);
+  border-radius: 50%;
+  z-index: 10000;
+  transition: background var(--transition-fast);
+}
+
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.lightbox-prev {
+  left: var(--space-md);
+}
+
+.lightbox-next {
+  right: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .testimonial-image-thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .lightbox-nav {
+    padding: var(--space-sm);
+  }
+
+  .lightbox-prev {
+    left: var(--space-sm);
+  }
+
+  .lightbox-next {
+    right: var(--space-sm);
+  }
+}
+
 /* ====================== */
 /* Product Card           */
 /* ====================== */

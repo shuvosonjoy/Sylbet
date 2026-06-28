@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Edit, Trash2, X, Home, Package, Layers, FolderTree, ShoppingBag } from 'lucide-react';
+import { LogOut, Plus, Edit, Trash2, X, Home, Package, Layers, FolderTree, ShoppingBag, MessageSquare, Star, ChevronUp, ChevronDown } from 'lucide-react';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from '../utils/toast';
@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [data, setData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Modal State
@@ -31,14 +32,22 @@ const AdminDashboard = () => {
 
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '', image: null });
   const [subcategoryForm, setSubcategoryForm] = useState({ name: '', description: '', category: '', image: null });
+  const [reviewForm, setReviewForm] = useState({
+    customerName: '', location: '', text: '', rating: 5, images: [],
+    existingImages: [], product: '', reviewDate: '', status: 'published',
+    featured: false
+  });
 
   useEffect(() => {
     fetchData();
     if (activeTab === 'products' || activeTab === 'subcategories') {
       fetchCategories();
     }
-    if (activeTab === 'products') {
+    if (activeTab === 'products' || activeTab === 'reviews') {
       fetchSubcategories();
+    }
+    if (activeTab === 'reviews') {
+      fetchAllProducts();
     }
   }, [activeTab]);
 
@@ -60,6 +69,15 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchAllProducts = async () => {
+    try {
+      const result = await api.getProducts({ limit: 200 });
+      setAllProducts(result.products || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -73,6 +91,8 @@ const AdminDashboard = () => {
         res = await api.getSubcategories();
       } else if (activeTab === 'orders') {
         res = await api.getOrders(token);
+      } else if (activeTab === 'reviews') {
+        res = await api.getAdminReviews(token);
       }
       setData(Array.isArray(res) ? res : []);
     } catch (error) {
@@ -136,6 +156,29 @@ const AdminDashboard = () => {
         });
       } else {
         setSubcategoryForm({ name: '', description: '', category: categories[0]?._id || '', image: null });
+      }
+    }
+
+    if (activeTab === 'reviews') {
+      if (mode === 'edit' && item) {
+        setReviewForm({
+          customerName: item.customerName || '',
+          location: item.location || '',
+          text: item.text || '',
+          rating: item.rating || 5,
+          images: [],
+          existingImages: item.images || [],
+          product: item.product?._id || item.product || '',
+          reviewDate: item.reviewDate ? item.reviewDate.split('T')[0] : '',
+          status: item.status || 'published',
+          featured: item.featured || false,
+        });
+      } else {
+        setReviewForm({
+          customerName: '', location: '', text: '', rating: 5, images: [],
+          existingImages: [], product: '', reviewDate: '', status: 'published',
+          featured: false
+        });
       }
     }
 
@@ -287,10 +330,68 @@ const AdminDashboard = () => {
       if (activeTab === 'products') await api.deleteProduct(id, token);
       else if (activeTab === 'categories') await api.deleteCategory(id, token);
       else if (activeTab === 'subcategories') await api.deleteSubcategory(id, token);
+      else if (activeTab === 'reviews') await api.deleteReview(id, token);
       showToast.success('Deleted successfully');
       fetchData();
     } catch (error) {
       showToast.error(error.message || 'Error deleting item');
+    }
+  };
+
+  // Review Submit
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('customerName', reviewForm.customerName);
+    formData.append('location', reviewForm.location);
+    formData.append('text', reviewForm.text);
+    formData.append('rating', reviewForm.rating);
+    formData.append('status', reviewForm.status);
+    formData.append('featured', reviewForm.featured);
+    if (reviewForm.product) formData.append('product', reviewForm.product);
+    if (reviewForm.reviewDate) formData.append('reviewDate', reviewForm.reviewDate);
+
+    if (modalMode === 'edit') {
+      formData.append('existingImages', JSON.stringify(reviewForm.existingImages));
+    }
+
+    if (reviewForm.images && reviewForm.images.length > 0) {
+      reviewForm.images.forEach(img => formData.append('images', img));
+    }
+
+    try {
+      if (modalMode === 'add') {
+        await api.createReview(formData, token);
+        showToast.success('Review created!');
+      } else {
+        await api.updateReview(currentItem._id, formData, token);
+        showToast.success('Review updated!');
+      }
+      closeModal();
+      fetchData();
+    } catch (error) {
+      showToast.error(error.message || 'Error saving review');
+    }
+  };
+
+  // Review Reorder
+  const handleReviewMove = async (index, direction) => {
+    const items = [...data];
+    const swapIndex = index + direction;
+    if (swapIndex < 0 || swapIndex >= items.length) return;
+
+    const tempOrder = items[index].sortOrder;
+    items[index].sortOrder = items[swapIndex].sortOrder;
+    items[swapIndex].sortOrder = tempOrder;
+
+    try {
+      await api.reorderReviews([
+        { id: items[index]._id, sortOrder: items[index].sortOrder },
+        { id: items[swapIndex]._id, sortOrder: items[swapIndex].sortOrder }
+      ], token);
+      fetchData();
+    } catch (error) {
+      showToast.error('Error reordering reviews');
     }
   };
 
@@ -479,6 +580,95 @@ const AdminDashboard = () => {
                         <option value="Delivered">Delivered</option>
                         <option value="Cancelled">Cancelled</option>
                       </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // REVIEWS
+    if (activeTab === 'reviews') {
+      return (
+        <div>
+          <div className="admin-header">
+            <h2>Reviews Management</h2>
+            <button className="btn btn-primary" onClick={() => openModal('add')}><Plus size={16} /> Add Review</button>
+          </div>
+          <div className="admin-table-wrapper">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Rating</th>
+                  <th>Review</th>
+                  <th>Images</th>
+                  <th>Status</th>
+                  <th>Featured</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.isArray(data) && data.map((item, index) => (
+                  <tr key={item._id}>
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <button
+                          className="admin-action-btn edit"
+                          onClick={() => handleReviewMove(index, -1)}
+                          disabled={index === 0}
+                          style={{ padding: '2px' }}
+                        ><ChevronUp size={14} /></button>
+                        <button
+                          className="admin-action-btn edit"
+                          onClick={() => handleReviewMove(index, 1)}
+                          disabled={index === data.length - 1}
+                          style={{ padding: '2px' }}
+                        ><ChevronDown size={14} /></button>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="font-medium">{item.customerName}</div>
+                      {item.location && <div className="text-sm text-muted">{item.location}</div>}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '1px', color: 'var(--color-accent)' }}>
+                        {Array.from({ length: item.rating || 0 }).map((_, j) => (
+                          <Star key={j} size={14} fill="currentColor" />
+                        ))}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="text-sm" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {item.text}
+                      </div>
+                      {item.product?.name && <div className="text-sm text-muted">Product: {item.product.name}</div>}
+                    </td>
+                    <td>
+                      {item.images?.length > 0 ? (
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {item.images.slice(0, 3).map((img, idx) => (
+                            <img key={idx} src={img} alt="" style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px' }} />
+                          ))}
+                          {item.images.length > 3 && <span className="text-sm text-muted">+{item.images.length - 3}</span>}
+                        </div>
+                      ) : <span className="text-muted">—</span>}
+                    </td>
+                    <td>
+                      <span className={`status-badge status-${item.status === 'published' ? 'Delivered' : item.status === 'draft' ? 'Pending' : 'Cancelled'}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td>{item.featured ? '⭐' : '—'}</td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button onClick={() => openModal('edit', item)} className="admin-action-btn edit"><Edit size={16} /></button>
+                        <button onClick={() => handleDelete(item._id)} className="admin-action-btn delete"><Trash2 size={16} /></button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -722,6 +912,111 @@ const AdminDashboard = () => {
         </form>
       );
     }
+
+    if (activeTab === 'reviews') {
+      return (
+        <form onSubmit={handleReviewSubmit}>
+          <div className="grid grid-cols-2">
+            <div className="form-group">
+              <label className="form-label">Customer Name *</label>
+              <input type="text" className="form-control" value={reviewForm.customerName}
+                onChange={(e) => setReviewForm({ ...reviewForm, customerName: e.target.value })} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Location</label>
+              <input type="text" className="form-control" value={reviewForm.location}
+                onChange={(e) => setReviewForm({ ...reviewForm, location: e.target.value })}
+                placeholder="e.g. Dhaka, Sylhet" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2">
+            <div className="form-group">
+              <label className="form-label">Rating *</label>
+              <select className="form-control" value={reviewForm.rating}
+                onChange={(e) => setReviewForm({ ...reviewForm, rating: Number(e.target.value) })}>
+                <option value={5}>5 Stars</option>
+                <option value={4}>4 Stars</option>
+                <option value={3}>3 Stars</option>
+                <option value={2}>2 Stars</option>
+                <option value={1}>1 Star</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Status</label>
+              <select className="form-control" value={reviewForm.status}
+                onChange={(e) => setReviewForm({ ...reviewForm, status: e.target.value })}>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+                <option value="hidden">Hidden</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Review Text *</label>
+            <textarea className="form-control" rows={4} value={reviewForm.text}
+              onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
+              placeholder="Customer review text..." required />
+          </div>
+
+          <div className="grid grid-cols-2">
+            <div className="form-group">
+              <label className="form-label">Product Reference</label>
+              <select className="form-control" value={reviewForm.product}
+                onChange={(e) => setReviewForm({ ...reviewForm, product: e.target.value })}>
+                <option value="">None</option>
+                {allProducts.map(p => (
+                  <option key={p._id} value={p._id}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Review Date</label>
+              <input type="date" className="form-control" value={reviewForm.reviewDate}
+                onChange={(e) => setReviewForm({ ...reviewForm, reviewDate: e.target.value })} />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Review Images (Max 5)</label>
+            <input type="file" className="form-control" accept="image/*" multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files).slice(0, 5);
+                setReviewForm({ ...reviewForm, images: files });
+              }} />
+
+            {modalMode === 'edit' && reviewForm.existingImages?.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                {reviewForm.existingImages.map((img, idx) => (
+                  <div key={idx} style={{ position: 'relative' }}>
+                    <img src={img} alt="" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--color-border)' }} />
+                    <button type="button"
+                      style={{ position: 'absolute', top: '-6px', right: '-6px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => {
+                        const updated = [...reviewForm.existingImages];
+                        updated.splice(idx, 1);
+                        setReviewForm({ ...reviewForm, existingImages: updated });
+                      }}
+                    >✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+              <input type="checkbox" checked={reviewForm.featured}
+                onChange={(e) => setReviewForm({ ...reviewForm, featured: e.target.checked })} />
+              Featured Review
+            </label>
+          </div>
+
+          <button type="submit" className="btn btn-primary btn-block">Save Review</button>
+        </form>
+      );
+    }
   };
 
   const getModalTitle = () => {
@@ -729,6 +1024,7 @@ const AdminDashboard = () => {
     if (activeTab === 'products') return `${action} Product`;
     if (activeTab === 'categories') return `${action} Category`;
     if (activeTab === 'subcategories') return `${action} Subcategory`;
+    if (activeTab === 'reviews') return `${action} Review`;
     return '';
   };
 
@@ -737,6 +1033,7 @@ const AdminDashboard = () => {
     { id: 'categories', label: 'Categories', icon: Layers },
     { id: 'subcategories', label: 'Subcategories', icon: FolderTree },
     { id: 'orders', label: 'Orders', icon: ShoppingBag },
+    { id: 'reviews', label: 'Reviews', icon: MessageSquare },
   ];
 
   return (

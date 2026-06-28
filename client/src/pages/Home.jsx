@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight, Truck, Shield, Leaf, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Truck, Shield, Leaf, Star, ArrowRight } from 'lucide-react';
 import { api } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { ProductGridSkeleton } from '../components/Skeleton';
@@ -22,33 +22,21 @@ const heroSlides = [
     image: '/sylbet_banner1.jpg',
     tag: 'Handmade, Heartmade',
     title: 'Discover <span class="hero-highlight">Natural Cane</span> Elegance',
-    subtitle: 'Timeless craftsmanship for modern homes.',
-    primaryLink: '/shop',
-    primaryText: 'Shop Collection',
-    secondaryLink: '/shop?featured=true',
-    secondaryText: 'Featured Pieces'
+    subtitle: 'Timeless craftsmanship for modern homes.'
   },
   {
     id: 2,
     image: '/sylbet_banner2.jpg',
     tag: 'Sustainable & Eco-Friendly',
     title: '<span class="hero-highlight">Eco-Cane</span> for Modern Living',
-    subtitle: 'Responsibly crafted furniture for a sustainable lifestyle.',
-    primaryLink: '/shop?eco=true',
-    primaryText: 'Explore Eco',
-    secondaryLink: '/shop',
-    secondaryText: 'All Products'
+    subtitle: 'Responsibly crafted furniture for a sustainable lifestyle.'
   },
   {
     id: 3,
     image: '/sylbet_banner3.png',
     tag: 'Custom Crafted',
     title: 'Artisanal <span class="hero-highlight">Masterpieces</span> Just for You',
-    subtitle: 'Each piece tells a story of skilled hands and timeless design – truly one of a kind.',
-    primaryLink: '/shop',
-    primaryText: 'Shop Now',
-    secondaryLink: '/shop?featured=true',
-    secondaryText: 'Featured'
+    subtitle: 'Each piece tells a story of skilled hands and timeless design – truly one of a kind.'
   }
 ];
 
@@ -179,14 +167,6 @@ const Home = () => {
                   dangerouslySetInnerHTML={{ __html: slide.title }}
                 />
                 <p className="hero-subtitle">{slide.subtitle}</p>
-                <div className="hero-buttons">
-                  <Link to={slide.primaryLink} className="btn btn-accent btn-lg">
-                    {slide.primaryText} <ArrowRight size={18} />
-                  </Link>
-                  <Link to={slide.secondaryLink} className="btn btn-outline-light btn-lg">
-                    {slide.secondaryText}
-                  </Link>
-                </div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -201,6 +181,9 @@ const Home = () => {
                     className="hero-banner-image"
                   />
                   <span className="hero-tag hero-tag-overlay">{slide.tag}</span>
+                  <Link to="/shop" className="hero-shop-btn">
+                    Shop Now <ArrowRight size={16} />
+                  </Link>
                 </div>
               </motion.div>
             </div>
@@ -343,12 +326,6 @@ const Home = () => {
               })}
             </motion.div>
           )}
-
-          <div className="section-cta">
-            <Link to="/shop?sort=bestSelling" className="btn btn-secondary">
-              View All Products <ArrowRight size={16} />
-            </Link>
-          </div>
         </div>
       </motion.section>
 
@@ -461,23 +438,6 @@ const Home = () => {
               </motion.div>
             ))}
           </motion.div>
-        </div>
-      </motion.section>
-
-      {/* CTA Banner */}
-      <motion.section
-        className="section section-cta-banner"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeUp}
-      >
-        <div className="container text-center">
-          <h2 className="cta-title">Ready to Transform Your Space?</h2>
-          <p className="cta-subtitle">Explore our full collection of handcrafted cane furniture</p>
-          <Link to="/shop" className="btn btn-accent btn-lg">
-            Shop Now <ArrowRight size={18} />
-          </Link>
         </div>
       </motion.section>
     </div>

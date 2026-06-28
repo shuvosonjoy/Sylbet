@@ -1430,6 +1430,14 @@ select.form-control {
   .slider-dot { width: 10px; height: 10px; }
   .slider-dot.active { width: 24px; }
   .hero { min-height: 60vh; }
+  .hero-tag-overlay {
+    bottom: 20px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.7rem;
+  }
+  .hero-image-card::after {
+    height: 35%;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1442,6 +1450,15 @@ select.form-control {
     height: 36px;
   }
   .slider-nav svg { width: 20px; height: 20px; }
+  .hero-tag-overlay {
+    bottom: 16px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.5px;
+  }
+  .hero-image-card::after {
+    height: 40%;
+  }
 }
 /* ====================== */
 /* Hero Section           */
@@ -1507,8 +1524,43 @@ select.form-control {
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.5px;
-  margin-bottom: var(--space-lg);
   border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Overlay variant – bottom-center of the hero-image-card */
+.hero-tag-overlay {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--color-white);
+  padding: 0.5rem 1.4rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Subtle bottom gradient for tagline readability */
+.hero-image-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  pointer-events: none;
+  z-index: 5;
 }
 
 .hero-title {
@@ -1544,6 +1596,7 @@ select.form-control {
 }
 
 .hero-image-card {
+  position: relative;
   width: 100%;
   max-width: 450px;
   aspect-ratio: 1 / 1;

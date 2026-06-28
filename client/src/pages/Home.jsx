@@ -18,31 +18,31 @@ const stagger = {
 // Slider data – change images as needed
 const heroSlides = [
   {
-  id: 1,
-  image: '/sylbet_banner1.jpg',
-  tag: 'Handcrafted with Love',
-  title: 'Discover <span class="hero-highlight">Natural Cane</span> Elegance',
-  subtitle: 'Timeless craftsmanship for modern homes.',
-  primaryLink: '/shop',
-  primaryText: 'Shop Collection',
-  secondaryLink: '/shop?featured=true',
-  secondaryText: 'Featured Pieces'
-},
- {
-  id: 2,
-  image: '/sylbet_banner2.jpg',
-  tag: 'Sustainable & Eco-Friendly',
-  title: '<span class="hero-highlight">Eco-Cane</span> for Modern Living',
-  subtitle: 'Responsibly crafted furniture for a sustainable lifestyle.',
-  primaryLink: '/shop?eco=true',
-  primaryText: 'Explore Eco',
-  secondaryLink: '/shop',
-  secondaryText: 'All Products'
-},
+    id: 1,
+    image: '/sylbet_banner1.jpg',
+    tag: 'Handmade, Heartmade',
+    title: 'Discover <span class="hero-highlight">Natural Cane</span> Elegance',
+    subtitle: 'Timeless craftsmanship for modern homes.',
+    primaryLink: '/shop',
+    primaryText: 'Shop Collection',
+    secondaryLink: '/shop?featured=true',
+    secondaryText: 'Featured Pieces'
+  },
+  {
+    id: 2,
+    image: '/sylbet_banner2.jpg',
+    tag: 'Sustainable & Eco-Friendly',
+    title: '<span class="hero-highlight">Eco-Cane</span> for Modern Living',
+    subtitle: 'Responsibly crafted furniture for a sustainable lifestyle.',
+    primaryLink: '/shop?eco=true',
+    primaryText: 'Explore Eco',
+    secondaryLink: '/shop',
+    secondaryText: 'All Products'
+  },
   {
     id: 3,
-    image: '/sylbet_banner3.jpg',
-    tag: 'Limited Edition',
+    image: '/sylbet_banner3.png',
+    tag: 'Custom Crafted',
     title: 'Artisanal <span class="hero-highlight">Masterpieces</span> Just for You',
     subtitle: 'Each piece tells a story of skilled hands and timeless design – truly one of a kind.',
     primaryLink: '/shop',
@@ -174,7 +174,6 @@ const Home = () => {
                 transition={{ duration: 0.8 }}
                 className="hero-text"
               >
-                <span className="hero-tag">{slide.tag}</span>
                 <h1 
                   className="hero-title"
                   dangerouslySetInnerHTML={{ __html: slide.title }}
@@ -201,6 +200,7 @@ const Home = () => {
                     alt="Sylbet"
                     className="hero-banner-image"
                   />
+                  <span className="hero-tag hero-tag-overlay">{slide.tag}</span>
                 </div>
               </motion.div>
             </div>

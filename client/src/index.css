@@ -439,12 +439,13 @@ select.form-control {
 /* Navbar Search Input */
 .nav-search-container {
   position: relative;
-  width: 200px;
-  transition: width var(--transition-normal);
+  width: 100%;
+  max-width: 200px;
+  transition: max-width var(--transition-normal);
 }
 
 .nav-search-container:focus-within {
-  width: 260px;
+  max-width: 260px;
 }
 
 .nav-search-form {
@@ -488,7 +489,8 @@ select.form-control {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 320px;
+  width: calc(100vw - 32px);
+  max-width: 320px;
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -1785,10 +1787,7 @@ select.form-control {
     min-height: 300px;
     padding: var(--space-md);
   }
-
   .category-card-icon {
-    width: 130px;
-    height: 130px;
     margin-bottom: var(--space-sm);
   }
 
@@ -1827,8 +1826,9 @@ select.form-control {
 }
 
 .category-card-icon {
-  width: 180px;
-  height: 180px;
+  width: 100%;
+  max-width: 180px;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, rgba(4,57,39,0.08), rgba(4,57,39,0.04));
   display: flex;
@@ -1845,8 +1845,6 @@ select.form-control {
 
 @media (max-width: 768px) {
   .category-card-icon {
-    width: 150px;
-    height: 150px;
     margin-bottom: var(--space-sm);
   }
 }
@@ -2373,7 +2371,8 @@ select.form-control {
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-full);
   font-size: 0.875rem;
-  width: 220px;
+  width: 100%;
+  max-width: 220px;
   transition: all var(--transition-fast);
   background: var(--color-white);
 }
@@ -2381,7 +2380,7 @@ select.form-control {
 .search-box input:focus {
   outline: none;
   border-color: var(--color-primary);
-  width: 280px;
+  max-width: 280px;
   box-shadow: 0 0 0 3px rgba(4,57,39,0.08);
 }
 
@@ -3101,12 +3100,25 @@ select.form-control {
   }
   .cart-table td:first-child { width: 100%; }
 
+  .admin-layout {
+    flex-direction: column;
+  }
+  
   .admin-sidebar {
-    width: 200px;
+    width: 100%;
+    height: auto;
+    position: relative;
     padding: var(--space-md) var(--space-sm);
+    flex-direction: row;
+    overflow-x: auto;
   }
 
-  .admin-sidebar h2 { font-size: 1.125rem; }
+  .admin-nav {
+    flex-direction: row;
+    margin-top: 0;
+  }
+
+  .admin-sidebar h2 { font-size: 1.125rem; white-space: nowrap; margin-right: var(--space-md); }
   .admin-content { padding: var(--space-md); }
 
   .shop-controls {

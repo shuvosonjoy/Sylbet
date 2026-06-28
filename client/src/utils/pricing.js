@@ -9,7 +9,9 @@
 
 export const getEffectiveUnitPrice = (item) => {
   const price = Number(item.price) || 0;
-  const discount = item.discountPrice != null ? Number(item.discountPrice) : null;
+  const discount = item.salePrice != null ? Number(item.salePrice)
+    : item.discountPrice != null ? Number(item.discountPrice)
+    : null;
   return discount != null && discount > 0 && discount < price ? discount : price;
 };
 
@@ -20,7 +22,8 @@ export const computeDeliveryChargeTotal = (items) => {
   const seen = new Set();
   let total = 0;
   for (const item of items) {
-    const key = String(item._id || item.product || item.name);
+    const productKey = String(item._id || item.product || item.name);
+    const key = item.variantId ? `${productKey}-${item.variantId}` : productKey;
     if (seen.has(key)) continue;
     seen.add(key);
     total += Number(item.deliveryCharge) || 0;

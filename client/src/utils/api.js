@@ -233,5 +233,16 @@ export const api = {
       headers: getHeaders(token)
     });
     return handleResponse(res);
+  },
+
+  uploadImage: async (file, token) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const res = await fetch(`${API_BASE}/upload`, {
+      method: 'POST',
+      headers: getHeaders(token, true),
+      body: formData
+    });
+    return handleResponse(res);
   }
 };

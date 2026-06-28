@@ -5,7 +5,6 @@ const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('../config/cloudinary');
 
-const path = require('path');
 const Product = require('../models/Product');
 const { protect, admin } = require('../middleware/auth');
 
@@ -18,6 +17,12 @@ const storage = new CloudinaryStorage({
 });
 
 const upload = multer({ storage });
+
+const parseJsonField = (value) => {
+  if (!value) return undefined;
+  if (typeof value === 'object') return value;
+  try { return JSON.parse(value); } catch { return undefined; }
+};
 
 router.get('/', async (req, res) => {
   try {
@@ -88,11 +93,12 @@ router.post(
         stock,
         deliveryCharge,
         featured,
-        bestSelling
+        bestSelling,
+        productType,
+        variantOptions: variantOptionsRaw,
+        variants: variantsRaw
       } = req.body;
 
-      // Delivery charge is required for new products. Reject missing, non-numeric,
-      // or negative values explicitly so the admin gets a clear error.
       if (deliveryCharge === undefined || deliveryCharge === null || deliveryCharge === '') {
         return res.status(400).json({ message: 'Delivery charge is required' });
       }
@@ -108,8 +114,17 @@ router.post(
         imageUrls = [req.file.path || req.file.secure_url];
       }
 
-      const product = new Product({
+      const type = productType === 'variable' ? 'variable' : 'simple';
+      const variantOptions = parseJsonField(variantOptionsRaw) || [];
+      const variants = parseJsonField(variantsRaw) || [];
+
+      if (type === 'variable' && variants.length === 0) {
+        return res.status(400).json({ message: 'Variable products must have at least one variant' });
+      }
+
+      const productData = {
         name,
+        productType: type,
         price: Number(price),
         discountPrice: discountPrice ? Number(discountPrice) : null,
         description,
@@ -120,9 +135,12 @@ router.post(
         stock: Number(stock) || 0,
         deliveryCharge: parsedDeliveryCharge,
         featured: featured === 'true',
-        bestSelling: bestSelling === 'true'
-      });
+        bestSelling: bestSelling === 'true',
+        variantOptions: type === 'variable' ? variantOptions : [],
+        variants: type === 'variable' ? variants : []
+      };
 
+      const product = new Product(productData);
       const createdProduct = await product.save();
       res.status(201).json(createdProduct);
 
@@ -134,7 +152,12 @@ router.post(
 
 router.put('/:id', protect, admin, upload.array('images', 4), async (req, res) => {
   try {
-    const { name, price, discountPrice, description, category, subcategory, stock, deliveryCharge, featured, bestSelling, existingImages } = req.body;
+    const {
+      name, price, discountPrice, description, category, subcategory,
+      stock, deliveryCharge, featured, bestSelling, existingImages,
+      productType, variantOptions: variantOptionsRaw, variants: variantsRaw
+    } = req.body;
+
     const product = await Product.findById(req.params.id);
 
     if (product) {
@@ -146,7 +169,6 @@ router.put('/:id', protect, admin, upload.array('images', 4), async (req, res) =
       product.subcategory = subcategory !== undefined ? (subcategory || null) : product.subcategory;
       product.stock = stock !== undefined ? Number(stock) : product.stock;
 
-      // Optional on update: only validate/assign if the admin provided a value.
       if (deliveryCharge !== undefined && deliveryCharge !== '') {
         const parsedDeliveryCharge = Number(deliveryCharge);
         if (Number.isNaN(parsedDeliveryCharge) || parsedDeliveryCharge < 0) {
@@ -158,6 +180,28 @@ router.put('/:id', protect, admin, upload.array('images', 4), async (req, res) =
       product.featured = featured !== undefined ? featured === 'true' : product.featured;
       product.bestSelling = bestSelling !== undefined ? bestSelling === 'true' : product.bestSelling;
 
+      // Product type
+      if (productType !== undefined) {
+        product.productType = productType === 'variable' ? 'variable' : 'simple';
+      }
+
+      // Variant data
+      const parsedVariantOptions = parseJsonField(variantOptionsRaw);
+      const parsedVariants = parseJsonField(variantsRaw);
+
+      if (product.productType === 'variable') {
+        if (parsedVariantOptions !== undefined) {
+          product.variantOptions = parsedVariantOptions;
+        }
+        if (parsedVariants !== undefined) {
+          product.variants = parsedVariants;
+        }
+      } else {
+        product.variantOptions = [];
+        product.variants = [];
+      }
+
+      // Handle images
       let keepImages = [];
       if (existingImages !== undefined) {
         try {

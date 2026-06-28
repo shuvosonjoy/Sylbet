@@ -31,6 +31,7 @@ app.use('/api/subcategories', require('./routes/subcategoryRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/wishlist', require('./routes/wishlistRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 // Root route
 app.get('/', (req, res) => {

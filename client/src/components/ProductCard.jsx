@@ -44,8 +44,11 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const isOutOfStock = product.stock <= 0;
-  const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+  const isVariable = product.productType === 'variable';
+  const isOutOfStock = isVariable
+    ? (product.totalStock != null ? product.totalStock <= 0 : product.stock <= 0)
+    : product.stock <= 0;
+  const hasDiscount = !isVariable && product.discountPrice && product.discountPrice < product.price;
   const discountPercent = hasDiscount ? Math.round(((product.price - product.discountPrice) / product.price) * 100) : 0;
 
   return (
@@ -84,7 +87,7 @@ const ProductCard = ({ product }) => {
           <button className="product-action-btn" onClick={handleWishlist} aria-label="Add to wishlist">
             <Heart size={18} />
           </button>
-          {!isOutOfStock && (
+          {!isOutOfStock && !isVariable && (
             <button className="product-action-btn" onClick={handleAddToCart} aria-label="Add to cart">
               <ShoppingCart size={18} />
             </button>
@@ -95,7 +98,11 @@ const ProductCard = ({ product }) => {
         <span className="product-category">{product.category?.name || 'Uncategorized'}</span>
         <h3 className="product-name">{product.name}</h3>
         <div className="product-footer">
-          <PriceDisplay price={product.price} discountPrice={product.discountPrice} size="md" />
+          {isVariable ? (
+            <PriceDisplay price={product.minPrice || product.price} isRange={true} size="md" />
+          ) : (
+            <PriceDisplay price={product.price} discountPrice={product.discountPrice} size="md" />
+          )}
         </div>
       </div>
     </Link>

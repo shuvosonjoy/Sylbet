@@ -4,6 +4,7 @@ import { LogOut, Plus, Edit, Trash2, X, Home, Package, Layers, FolderTree, Shopp
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from '../utils/toast';
+import VariantBuilder from '../components/VariantBuilder';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
     name: '', price: '', discountPrice: '', description: '',
     category: '', subcategory: '', stock: '', deliveryCharge: '',
     featured: false, bestSelling: false, images: [], existingImages: [],
+    productType: 'simple', variantOptions: [], variants: [],
   });
 
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '', image: null });
@@ -103,6 +105,9 @@ const AdminDashboard = () => {
           subcategory: item.subcategory?._id || '', stock: item.stock || 0,
           deliveryCharge: item.deliveryCharge != null ? item.deliveryCharge : '',
           featured: item.featured || false, bestSelling: item.bestSelling || false, images: [], existingImages: item.images || (item.image ? [item.image] : []),
+          productType: item.productType || 'simple',
+          variantOptions: item.variantOptions || [],
+          variants: item.variants || [],
         });
       } else {
         setProductForm({
@@ -110,6 +115,7 @@ const AdminDashboard = () => {
           category: categories[0]?._id || '', subcategory: '', stock: 0,
           deliveryCharge: '',
           featured: false, bestSelling: false, images: [], existingImages: [],
+          productType: 'simple', variantOptions: [], variants: [],
         });
       }
     }
@@ -170,6 +176,19 @@ const AdminDashboard = () => {
     }
     formData.append('featured', productForm.featured);
     formData.append('bestSelling', productForm.bestSelling);
+    formData.append('productType', productForm.productType);
+
+    if (productForm.productType === 'variable') {
+      formData.append('variantOptions', JSON.stringify(productForm.variantOptions));
+      const cleanedVariants = productForm.variants.map(v => ({
+        ...v,
+        price: Number(v.price) || 0,
+        salePrice: v.salePrice ? Number(v.salePrice) : null,
+        stock: Number(v.stock) || 0,
+        deliveryCharge: v.deliveryCharge !== '' && v.deliveryCharge != null ? Number(v.deliveryCharge) : null,
+      }));
+      formData.append('variants', JSON.stringify(cleanedVariants));
+    }
     
     if (modalMode === 'edit') {
       formData.append('existingImages', JSON.stringify(productForm.existingImages));
@@ -432,7 +451,14 @@ const AdminDashboard = () => {
                     </td>
                     <td>
                       {item.items?.map((it, idx) => (
-                        <div key={idx} className="text-sm">{it.name} x{it.quantity}</div>
+                        <div key={idx} className="text-sm">
+                          {it.name} x{it.quantity}
+                          {it.variantOptions && (
+                            <span className="text-muted" style={{ fontSize: '0.75rem', display: 'block' }}>
+                              {Object.entries(typeof it.variantOptions === 'object' && it.variantOptions !== null ? it.variantOptions : {}).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                            </span>
+                          )}
+                        </div>
                       ))}
                     </td>
                     <td>৳{Number(item.subtotal || 0).toLocaleString()}</td>
@@ -475,40 +501,93 @@ const AdminDashboard = () => {
               onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required />
           </div>
 
-          <div className="grid grid-cols-2">
-            <div className="form-group">
-              <label className="form-label">Price (৳)</label>
-              <input type="number" className="form-control" value={productForm.price}
-                onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Discount Price (৳)</label>
-              <input type="number" className="form-control" value={productForm.discountPrice}
-                onChange={(e) => setProductForm({ ...productForm, discountPrice: e.target.value })}
-                placeholder="Leave empty for no discount" />
+          <div className="form-group">
+            <label className="form-label">Product Type</label>
+            <div className="product-type-toggle">
+              <button type="button"
+                className={`product-type-btn ${productForm.productType === 'simple' ? 'active' : ''}`}
+                onClick={() => setProductForm({ ...productForm, productType: 'simple' })}>
+                Simple Product
+              </button>
+              <button type="button"
+                className={`product-type-btn ${productForm.productType === 'variable' ? 'active' : ''}`}
+                onClick={() => setProductForm({ ...productForm, productType: 'variable' })}>
+                Variable Product
+              </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2">
-            <div className="form-group">
-              <label className="form-label">Stock</label>
-              <input type="number" className="form-control" value={productForm.stock}
-                onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} required />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Delivery Charge (৳) *</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="form-control"
-                value={productForm.deliveryCharge}
-                onChange={(e) => setProductForm({ ...productForm, deliveryCharge: e.target.value })}
-                placeholder="e.g. 60 (use 0 for free delivery)"
-                required
+          {productForm.productType === 'simple' && (
+            <>
+              <div className="grid grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Price (৳)</label>
+                  <input type="number" className="form-control" value={productForm.price}
+                    onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Discount Price (৳)</label>
+                  <input type="number" className="form-control" value={productForm.discountPrice}
+                    onChange={(e) => setProductForm({ ...productForm, discountPrice: e.target.value })}
+                    placeholder="Leave empty for no discount" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Stock</label>
+                  <input type="number" className="form-control" value={productForm.stock}
+                    onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} required />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Delivery Charge (৳) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="form-control"
+                    value={productForm.deliveryCharge}
+                    onChange={(e) => setProductForm({ ...productForm, deliveryCharge: e.target.value })}
+                    placeholder="e.g. 60 (use 0 for free delivery)"
+                    required
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {productForm.productType === 'variable' && (
+            <>
+              <div className="form-group">
+                <label className="form-label">Default Delivery Charge (৳)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="form-control"
+                  value={productForm.deliveryCharge}
+                  onChange={(e) => setProductForm({ ...productForm, deliveryCharge: e.target.value })}
+                  placeholder="Inherited by variants without their own charge"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Base Price (৳)</label>
+                <input type="number" className="form-control" value={productForm.price}
+                  onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                  placeholder="Fallback price" required />
+              </div>
+              <VariantBuilder
+                variantOptions={productForm.variantOptions}
+                variants={productForm.variants}
+                onChange={({ variantOptions, variants }) =>
+                  setProductForm({ ...productForm, variantOptions, variants })
+                }
+                productName={productForm.name}
+                token={token}
               />
-            </div>
-          </div>
+            </>
+          )}
 
           <div className="form-group">
             <label className="form-label">Category</label>

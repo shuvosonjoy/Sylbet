@@ -54,7 +54,8 @@ const Checkout = () => {
           name: item.name,
           quantity: item.quantity,
           price: getEffectivePrice(item),
-          deliveryCharge: Number(item.deliveryCharge) || 0
+          deliveryCharge: Number(item.deliveryCharge) || 0,
+          variantId: item.variantId || null,
         })),
         subtotal: cartSubtotal,
         deliveryChargeTotal: cartDeliveryCharge,
@@ -171,10 +172,16 @@ const Checkout = () => {
             <div style={{ marginBottom: 'var(--space-lg)' }}>
               {cartItems.map(item => {
                 const effectivePrice = getEffectivePrice(item);
+                const key = item.cartKey || item._id;
                 return (
-                  <div key={item._id} className="summary-row" style={{ alignItems: 'center' }}>
+                  <div key={key} className="summary-row" style={{ alignItems: 'center' }}>
                     <div style={{ flex: 1 }}>
                       <p className="font-medium text-sm">{item.name}</p>
+                      {item.variantOptions && (
+                        <p className="text-muted" style={{ fontSize: '0.75rem' }}>
+                          {Object.entries(item.variantOptions).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                        </p>
+                      )}
                       <p className="text-muted text-sm">Qty: {item.quantity}</p>
                     </div>
                     <div className="font-medium text-sm">

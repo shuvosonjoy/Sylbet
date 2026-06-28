@@ -13,41 +13,72 @@ router.post('/', optionalAuth, async (req, res) => {
       return res.status(400).json({ message: 'No order items' });
     }
 
-    // Hydrate items from the database. We never trust client-supplied prices or
-    // delivery charges — the canonical values come from the Product collection.
     const hydratedItems = [];
     for (const item of items) {
       const product = await Product.findById(item.product);
       if (!product) {
         return res.status(400).json({ message: `Product not found: ${item.name}` });
       }
-      if (product.stock < item.quantity) {
-        return res.status(400).json({
-          message: `Insufficient stock for "${product.name}". Available: ${product.stock}, Requested: ${item.quantity}`
-        });
-      }
 
-      // Snapshot price + delivery charge at purchase time so historical orders
-      // are immutable against future product edits.
-      const unitPrice = getEffectiveUnitPrice({
-        price: product.price,
-        discountPrice: product.discountPrice
-      });
+      let unitPrice, deliveryCharge, variantId = null, variantOpts = null;
+
+      if (item.variantId && product.productType === 'variable') {
+        const variant = product.variants.id(item.variantId);
+        if (!variant) {
+          return res.status(400).json({ message: `Variant not found for "${product.name}"` });
+        }
+        if (!variant.isActive) {
+          return res.status(400).json({ message: `Variant is no longer available for "${product.name}"` });
+        }
+        if (variant.stock < item.quantity) {
+          return res.status(400).json({
+            message: `Insufficient stock for "${product.name}" variant. Available: ${variant.stock}, Requested: ${item.quantity}`
+          });
+        }
+        unitPrice = getEffectiveUnitPrice({
+          price: variant.price,
+          discountPrice: variant.salePrice
+        });
+        deliveryCharge = variant.deliveryCharge != null ? variant.deliveryCharge : (Number(product.deliveryCharge) || 0);
+        variantId = variant._id;
+        variantOpts = variant.optionValues instanceof Map
+          ? Object.fromEntries(variant.optionValues)
+          : variant.optionValues;
+      } else {
+        if (product.stock < item.quantity) {
+          return res.status(400).json({
+            message: `Insufficient stock for "${product.name}". Available: ${product.stock}, Requested: ${item.quantity}`
+          });
+        }
+        unitPrice = getEffectiveUnitPrice({
+          price: product.price,
+          discountPrice: product.discountPrice
+        });
+        deliveryCharge = Number(product.deliveryCharge) || 0;
+      }
 
       hydratedItems.push({
         product: product._id,
         name: product.name,
         quantity: Number(item.quantity),
         price: unitPrice,
-        deliveryCharge: Number(product.deliveryCharge) || 0
+        deliveryCharge,
+        variantId,
+        variantOptions: variantOpts
       });
     }
 
-    // Decrement stock for each item (after validation passes for all items).
     for (const item of hydratedItems) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: -item.quantity }
-      });
+      if (item.variantId) {
+        await Product.findOneAndUpdate(
+          { _id: item.product, 'variants._id': item.variantId },
+          { $inc: { 'variants.$.stock': -item.quantity } }
+        );
+      } else {
+        await Product.findByIdAndUpdate(item.product, {
+          $inc: { stock: -item.quantity }
+        });
+      }
     }
 
     const totals = computeOrderTotals(hydratedItems);
@@ -99,9 +130,16 @@ router.put('/:id', protect, admin, async (req, res) => {
       // If cancelling, restore stock
       if (status === 'Cancelled' && order.status !== 'Cancelled') {
         for (const item of order.items) {
-          await Product.findByIdAndUpdate(item.product, {
-            $inc: { stock: item.quantity }
-          });
+          if (item.variantId) {
+            await Product.findOneAndUpdate(
+              { _id: item.product, 'variants._id': item.variantId },
+              { $inc: { 'variants.$.stock': item.quantity } }
+            );
+          } else {
+            await Product.findByIdAndUpdate(item.product, {
+              $inc: { stock: item.quantity }
+            });
+          }
         }
       }
       order.status = status || order.status;

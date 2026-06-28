@@ -12,10 +12,9 @@ const orderSchema = mongoose.Schema({
     name: String,
     quantity: Number,
     price: Number,
-    // Snapshot of the product's delivery charge at the moment of purchase.
-    // Stored so future changes to Product.deliveryCharge do not retroactively
-    // alter historical orders.
-    deliveryCharge: { type: Number, default: 0, min: 0 }
+    deliveryCharge: { type: Number, default: 0, min: 0 },
+    variantId: { type: mongoose.Schema.Types.ObjectId, default: null },
+    variantOptions: { type: Map, of: String, default: null }
   }],
   // Order-level breakdown, captured server-side. Legacy orders that pre-date
   // these fields default to 0 / fall back to totalAmount where appropriate.

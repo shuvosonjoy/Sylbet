@@ -3524,3 +3524,450 @@ select.form-control {
     text-align: left;
   }
 }
+
+/* ====================== */
+/* Product Type Toggle    */
+/* ====================== */
+.product-type-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.product-type-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: var(--color-bg);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+
+.product-type-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* ====================== */
+/* Variant Builder (Admin)*/
+/* ====================== */
+.variant-builder {
+  margin-top: var(--space-md);
+}
+
+.variant-builder-section {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-bg-alt, #f9f9f9);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.variant-builder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.variant-builder-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.variant-option-row {
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm);
+  background: white;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.variant-option-name {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.variant-option-name .form-control {
+  flex: 1;
+}
+
+.variant-option-remove {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.variant-option-remove:hover {
+  background: var(--color-danger-light);
+}
+
+.variant-tag-input {
+  min-height: 38px;
+}
+
+.variant-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: white;
+  min-height: 38px;
+}
+
+.variant-tags input {
+  border: none;
+  outline: none;
+  padding: 4px 8px;
+  font-size: 0.875rem;
+  flex: 1;
+  min-width: 120px;
+  background: transparent;
+}
+
+.variant-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.variant-tag button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.variant-tag button:hover {
+  opacity: 1;
+}
+
+/* Variants List */
+.variants-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.variant-card {
+  padding: var(--space-md);
+  background: white;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.variant-card.variant-inactive {
+  opacity: 0.5;
+}
+
+.variant-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.variant-card-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-primary-dark);
+}
+
+.variant-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.variant-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.variant-toggle-text {
+  color: var(--color-text-muted);
+}
+
+.variant-remove-btn {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.variant-card-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.variant-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.variant-field .form-control {
+  padding: 6px 8px;
+  font-size: 0.85rem;
+}
+
+.variant-card-images label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.variant-images-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.variant-image-thumb {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.variant-image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.variant-image-thumb button {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--color-danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  font-size: 8px;
+}
+
+.variant-image-upload {
+  width: 48px;
+  height: 48px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: border-color 0.2s;
+}
+
+.variant-image-upload:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.variant-uploading {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.variant-bulk-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ====================== */
+/* Variant Selector (PDP) */
+/* ====================== */
+.variant-selectors {
+  margin: var(--space-md) 0;
+}
+
+.variant-selector {
+  margin-bottom: var(--space-md);
+}
+
+.variant-selector-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text-main);
+}
+
+.variant-selector-value {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.variant-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.variant-pill {
+  padding: 8px 18px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-main);
+  transition: all 0.2s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.variant-pill:hover:not(.disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.variant-pill.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.variant-pill.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.variant-pill.out-of-stock {
+  opacity: 0.5;
+  position: relative;
+}
+
+.variant-pill.out-of-stock::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 1px;
+  background: var(--color-text-muted);
+}
+
+/* Color Swatches */
+.variant-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--color-border);
+  cursor: pointer;
+  padding: 3px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.variant-swatch-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--swatch-color, #ccc);
+}
+
+.variant-swatch:hover:not(.disabled) {
+  border-color: var(--color-primary);
+}
+
+.variant-swatch.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.variant-swatch.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Price From */
+.price-from {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* ====================== */
+/* Variant Responsive     */
+/* ====================== */
+@media (max-width: 768px) {
+  .variant-card-fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .variant-bulk-actions {
+    flex-wrap: wrap;
+  }
+  .variant-pill {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    min-height: 48px;
+  }
+  .variant-swatch {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .variant-card-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+  .variant-builder-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+}

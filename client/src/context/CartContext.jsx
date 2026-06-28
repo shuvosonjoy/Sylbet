@@ -5,6 +5,11 @@ const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
+const getCartKey = (product, variant) => {
+  if (variant?.variantId) return `${product._id}-${variant.variantId}`;
+  return product._id;
+};
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem('sylbets_cart');
@@ -15,40 +20,63 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('sylbets_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1) => {
-    if (product.stock <= 0) return false;
+  const addToCart = (product, quantity = 1, variant = null) => {
+    const stock = variant ? variant.stock : product.stock;
+    if (stock <= 0) return false;
+
+    const cartKey = getCartKey(product, variant);
 
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item._id === product._id);
+      const existingItem = prevItems.find(item => item.cartKey === cartKey);
       if (existingItem) {
         const newQty = existingItem.quantity + quantity;
-        if (newQty > product.stock) return prevItems;
+        if (newQty > stock) return prevItems;
         return prevItems.map(item =>
-          item._id === product._id
+          item.cartKey === cartKey
             ? { ...item, quantity: newQty }
             : item
         );
       }
-      if (quantity > product.stock) return prevItems;
-      // Persist deliveryCharge alongside the cart item so cart math survives
-      // a page reload even if the product is later edited.
-      return [...prevItems, { ...product, quantity, deliveryCharge: Number(product.deliveryCharge) || 0 }];
+      if (quantity > stock) return prevItems;
+
+      const cartItem = {
+        ...product,
+        cartKey,
+        quantity,
+        deliveryCharge: variant
+          ? Number(variant.deliveryCharge ?? product.deliveryCharge) || 0
+          : Number(product.deliveryCharge) || 0,
+      };
+
+      if (variant) {
+        cartItem.variantId = variant.variantId;
+        cartItem.variantOptions = variant.variantOptions;
+        cartItem.price = variant.price;
+        cartItem.salePrice = variant.salePrice;
+        cartItem.stock = variant.stock;
+        if (variant.images?.length > 0) {
+          cartItem.image = variant.images[0];
+          cartItem.images = variant.images;
+        }
+      }
+
+      return [...prevItems, cartItem];
     });
     return true;
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems(prevItems => prevItems.filter(item => item._id !== productId));
+  const removeFromCart = (cartKey) => {
+    setCartItems(prevItems => prevItems.filter(item => (item.cartKey || item._id) !== cartKey));
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (cartKey, quantity) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(cartKey);
       return;
     }
     setCartItems(prevItems =>
       prevItems.map(item => {
-        if (item._id === productId) {
+        if ((item.cartKey || item._id) === cartKey) {
           const maxQty = item.stock || 999;
           return { ...item, quantity: Math.min(quantity, maxQty) };
         }

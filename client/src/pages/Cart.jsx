@@ -44,8 +44,10 @@ const Cart = () => {
             <tbody>
               {cartItems.map(item => {
                 const effectivePrice = getEffectivePrice(item);
+                const key = item.cartKey || item._id;
+                const variantOpts = item.variantOptions;
                 return (
-                  <tr key={item._id}>
+                  <tr key={key}>
                     <td>
                       <div className="cart-item-info">
                         {item.image ? (
@@ -57,23 +59,28 @@ const Cart = () => {
                         )}
                         <div>
                           <Link to={`/product/${item._id}`} className="font-medium">{item.name}</Link>
-                          {item.category?.name && <p className="text-sm text-muted">{item.category.name}</p>}
+                          {variantOpts && (
+                            <p className="text-sm text-muted">
+                              {Object.entries(variantOpts).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                            </p>
+                          )}
+                          {!variantOpts && item.category?.name && <p className="text-sm text-muted">{item.category.name}</p>}
                         </div>
                       </div>
                     </td>
                     <td>
-                      <PriceDisplay price={item.price} discountPrice={item.discountPrice} size="sm" />
+                      <PriceDisplay price={item.price} discountPrice={item.salePrice || item.discountPrice} size="sm" />
                     </td>
                     <td>
                       <div className="qty-selector" style={{ marginBottom: 0 }}>
-                        <button className="qty-btn" onClick={() => updateQuantity(item._id, item.quantity - 1)}><Minus size={14} /></button>
+                        <button className="qty-btn" onClick={() => updateQuantity(key, item.quantity - 1)}><Minus size={14} /></button>
                         <input type="number" className="qty-input" value={item.quantity} readOnly />
-                        <button className="qty-btn" onClick={() => updateQuantity(item._id, item.quantity + 1)}><Plus size={14} /></button>
+                        <button className="qty-btn" onClick={() => updateQuantity(key, item.quantity + 1)}><Plus size={14} /></button>
                       </div>
                     </td>
                     <td className="font-medium text-primary-dark">৳{(effectivePrice * item.quantity).toLocaleString()}</td>
                     <td>
-                      <button className="remove-btn" onClick={() => handleRemove(item._id)} aria-label="Remove item">
+                      <button className="remove-btn" onClick={() => handleRemove(key)} aria-label="Remove item">
                         <Trash2 size={18} />
                       </button>
                     </td>

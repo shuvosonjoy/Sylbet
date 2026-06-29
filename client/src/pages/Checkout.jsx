@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { showToast } from '../utils/toast';
+import { Animated } from '../components/Animated';
 
 const Checkout = () => {
   const { cartItems, cartSubtotal, cartDeliveryCharge, cartTotal, clearCart, getEffectivePrice } = useCart();
@@ -79,9 +80,12 @@ const Checkout = () => {
 
   return (
     <div className="container section">
-      <h1 className="section-title text-center">Checkout</h1>
+      <Animated animation="fade-up">
+        <h1 className="section-title text-center">Checkout</h1>
+      </Animated>
 
-      <div className="checkout-grid">
+      <Animated animation="fade-up" delay={0.1}>
+        <div className="checkout-grid">
         <div className="checkout-form">
           <h2 style={{ marginBottom: 'var(--space-lg)' }}>Billing Details</h2>
 
@@ -210,7 +214,8 @@ const Checkout = () => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      </Animated>
     </div>
   );
 };

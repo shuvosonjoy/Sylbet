@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
+import { Animated } from '../components/Animated';
 
 const OrderSuccess = () => {
   // The Checkout page now passes the persisted order in router state so this
@@ -11,15 +12,17 @@ const OrderSuccess = () => {
 
   return (
     <div className="container section text-center" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-      <CheckCircle size={80} color="var(--color-success)" style={{ marginBottom: 'var(--space-lg)' }} />
-      <h1 className="section-title">Order Placed Successfully!</h1>
-      <p className="text-lg text-muted" style={{ maxWidth: '600px', margin: '0 auto var(--space-lg)' }}>
-        Thank you for your purchase from Sylbets. We have received your order details.
-        We will verify your bKash payment and contact you shortly to confirm delivery.
-      </p>
+      <Animated animation="scale-up">
+        <CheckCircle size={80} color="var(--color-success)" style={{ marginBottom: 'var(--space-lg)' }} />
+        <h1 className="section-title">Order Placed Successfully!</h1>
+        <p className="text-lg text-muted" style={{ maxWidth: '600px', margin: '0 auto var(--space-lg)' }}>
+          Thank you for your purchase from Sylbets. We have received your order details.
+          We will verify your bKash payment and contact you shortly to confirm delivery.
+        </p>
+      </Animated>
 
       {order && (
-        <div className="card" style={{ maxWidth: '560px', width: '100%', margin: '0 auto var(--space-xl)', textAlign: 'left', padding: 'var(--space-lg)' }}>
+        <Animated animation="fade-up" delay={0.2} as="div" className="card" style={{ maxWidth: '560px', width: '100%', margin: '0 auto var(--space-xl)', textAlign: 'left', padding: 'var(--space-lg)' }}>
           <h3 style={{ marginBottom: 'var(--space-md)' }}>Invoice</h3>
 
           <div style={{ marginBottom: 'var(--space-md)', fontSize: '0.9rem' }}>
@@ -53,12 +56,14 @@ const OrderSuccess = () => {
               <span className="text-accent">৳{Number(order.totalAmount || 0).toLocaleString()}</span>
             </div>
           </div>
-        </div>
+        </Animated>
       )}
 
-      <Link to="/shop" className="btn btn-primary">
-        Continue Shopping
-      </Link>
+      <Animated animation="fade-up" delay={0.3}>
+        <Link to="/shop" className="btn btn-primary">
+          Continue Shopping
+        </Link>
+      </Animated>
     </div>
   );
 };

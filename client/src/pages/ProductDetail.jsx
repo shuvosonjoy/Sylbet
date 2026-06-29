@@ -10,6 +10,7 @@ import StockBadge from '../components/StockBadge';
 import ProductImageGallery from '../components/ProductImageGallery';
 import ProductDescription from '../components/ProductDescription';
 import VariantSelector from '../components/VariantSelector';
+import { Animated } from '../components/Animated';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -218,12 +219,15 @@ const ProductDetail = () => {
 
       <div className="container section">
         <div className="product-detail-grid">
-          <ProductImageGallery
-            images={displayImages}
-            productName={product.name}
-          />
+          <Animated animation="fade-in" duration={0.6}>
+            <ProductImageGallery
+              images={displayImages}
+              productName={product.name}
+            />
+          </Animated>
 
-          <div className="product-detail-info">
+          <Animated animation="fade-up" delay={0.15}>
+            <div className="product-detail-info">
             <div className="product-detail-meta">
               {product.category && (
                 <Link to={`/shop?category=${product.category._id}`} className="product-detail-category">
@@ -310,7 +314,8 @@ const ProductDetail = () => {
                 <Heart size={20} />
               </button>
             </div>
-          </div>
+            </div>
+          </Animated>
         </div>
       </div>
     </div>

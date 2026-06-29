@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { showToast } from '../utils/toast';
 import PriceDisplay from '../components/PriceDisplay';
+import { Animated, StaggerContainer } from '../components/Animated';
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -51,7 +52,9 @@ const Wishlist = () => {
 
   return (
     <div className="container section">
-      <h1 className="section-title text-center">My Wishlist</h1>
+      <Animated animation="fade-up">
+        <h1 className="section-title text-center">My Wishlist</h1>
+      </Animated>
 
       {wishlist.length === 0 ? (
         <div className="empty-state">
@@ -60,7 +63,7 @@ const Wishlist = () => {
           <Link to="/shop" className="btn btn-primary" style={{ marginTop: '1rem' }}>Browse Products</Link>
         </div>
       ) : (
-        <div className="grid grid-cols-4">
+        <StaggerContainer animation="fade-up" className="grid grid-cols-4" staggerDelay={0.08}>
           {wishlist.map(product => (
             <div key={product._id} className="card product-card">
               <Link to={`/product/${product._id}`} className="product-img-wrapper">
@@ -85,7 +88,7 @@ const Wishlist = () => {
               </div>
             </div>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );

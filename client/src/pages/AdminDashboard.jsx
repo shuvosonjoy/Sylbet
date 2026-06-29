@@ -40,12 +40,24 @@ const AdminDashboard = () => {
 
   // Settings state
   const [categoryCardStyle, setCategoryCardStyle] = useState('woven');
+  const [animationSettings, setAnimationSettings] = useState({
+    animationsEnabled: true,
+    animationSpeed: 'normal',
+    staggerEnabled: true,
+    parallaxEnabled: true,
+    smoothScrollEnabled: true,
+  });
   const [settingsSaving, setSettingsSaving] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'settings') {
       api.getSetting('categoryCardStyle').then(res => {
         if (res?.value) setCategoryCardStyle(res.value);
+      }).catch(() => {});
+      api.getSetting('animationSettings').then(res => {
+        if (res?.value && typeof res.value === 'object') {
+          setAnimationSettings(prev => ({ ...prev, ...res.value }));
+        }
       }).catch(() => {});
     }
   }, [activeTab]);
@@ -701,7 +713,10 @@ const AdminDashboard = () => {
       const handleSaveSettings = async () => {
         setSettingsSaving(true);
         try {
-          await api.updateSetting('categoryCardStyle', categoryCardStyle, token);
+          await Promise.all([
+            api.updateSetting('categoryCardStyle', categoryCardStyle, token),
+            api.updateSetting('animationSettings', animationSettings, token),
+          ]);
           showToast.success('Settings saved!');
         } catch (error) {
           showToast.error(error.message || 'Error saving settings');
@@ -709,6 +724,12 @@ const AdminDashboard = () => {
           setSettingsSaving(false);
         }
       };
+
+      const speedOptions = [
+        { id: 'slow', name: 'Slow', desc: 'Relaxed, cinematic feel' },
+        { id: 'normal', name: 'Normal', desc: 'Balanced and smooth' },
+        { id: 'fast', name: 'Fast', desc: 'Quick and snappy' },
+      ];
 
       return (
         <div className="settings-section">
@@ -752,6 +773,85 @@ const AdminDashboard = () => {
               disabled={settingsSaving}
             >
               {settingsSaving ? 'Saving...' : 'Save Settings'}
+            </button>
+          </div>
+
+          <div className="settings-card">
+            <h3 className="settings-card-title">Scroll Animations</h3>
+            <p className="settings-card-desc">Control scroll-triggered animations across the entire site.</p>
+
+            <div className="form-group" style={{ marginBottom: 'var(--space-lg)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.9375rem', fontWeight: 500 }}>
+                <input
+                  type="checkbox"
+                  checked={animationSettings.animationsEnabled}
+                  onChange={(e) => setAnimationSettings({ ...animationSettings, animationsEnabled: e.target.checked })}
+                  style={{ width: '18px', height: '18px' }}
+                />
+                Enable scroll animations
+              </label>
+            </div>
+
+            {animationSettings.animationsEnabled && (
+              <>
+                <div className="form-group" style={{ marginBottom: 'var(--space-lg)' }}>
+                  <label className="form-label">Animation Speed</label>
+                  <div className="style-options" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                    {speedOptions.map(opt => (
+                      <div
+                        key={opt.id}
+                        className={`style-option ${animationSettings.animationSpeed === opt.id ? 'selected' : ''}`}
+                        onClick={() => setAnimationSettings({ ...animationSettings, animationSpeed: opt.id })}
+                      >
+                        <div className="style-option-radio" />
+                        <div className="style-option-name">{opt.name}</div>
+                        <div className="style-option-desc">{opt.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.9375rem', fontWeight: 500 }}>
+                    <input
+                      type="checkbox"
+                      checked={animationSettings.staggerEnabled}
+                      onChange={(e) => setAnimationSettings({ ...animationSettings, staggerEnabled: e.target.checked })}
+                      style={{ width: '18px', height: '18px' }}
+                    />
+                    Stagger effects on grids
+                  </label>
+
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.9375rem', fontWeight: 500 }}>
+                    <input
+                      type="checkbox"
+                      checked={animationSettings.parallaxEnabled}
+                      onChange={(e) => setAnimationSettings({ ...animationSettings, parallaxEnabled: e.target.checked })}
+                      style={{ width: '18px', height: '18px' }}
+                    />
+                    Parallax effect on hero background
+                  </label>
+
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.9375rem', fontWeight: 500 }}>
+                    <input
+                      type="checkbox"
+                      checked={animationSettings.smoothScrollEnabled}
+                      onChange={(e) => setAnimationSettings({ ...animationSettings, smoothScrollEnabled: e.target.checked })}
+                      style={{ width: '18px', height: '18px' }}
+                    />
+                    Smooth scrolling
+                  </label>
+                </div>
+              </>
+            )}
+
+            <button
+              className="btn btn-primary"
+              onClick={handleSaveSettings}
+              disabled={settingsSaving}
+              style={{ marginTop: 'var(--space-lg)' }}
+            >
+              {settingsSaving ? 'Saving...' : 'Save All Settings'}
             </button>
           </div>
         </div>

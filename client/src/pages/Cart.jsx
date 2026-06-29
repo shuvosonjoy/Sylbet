@@ -4,6 +4,7 @@ import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { showToast } from '../utils/toast';
 import PriceDisplay from '../components/PriceDisplay';
+import { Animated } from '../components/Animated';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, cartSubtotal, cartDeliveryCharge, cartTotal, getEffectivePrice } = useCart();
@@ -27,9 +28,12 @@ const Cart = () => {
 
   return (
     <div className="container section">
-      <h1 className="section-title">Your Cart</h1>
+      <Animated animation="fade-up">
+        <h1 className="section-title">Your Cart</h1>
+      </Animated>
 
-      <div className="cart-layout">
+      <Animated animation="fade-up" delay={0.1}>
+        <div className="cart-layout">
         <div className="cart-items-container card" style={{ padding: 'var(--space-lg)' }}>
           <table className="cart-table">
             <thead>
@@ -122,7 +126,8 @@ const Cart = () => {
             <Link to="/shop" className="text-muted">← Continue Shopping</Link>
           </div>
         </div>
-      </div>
+        </div>
+      </Animated>
     </div>
   );
 };

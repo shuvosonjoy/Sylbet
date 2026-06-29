@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { api } from '../utils/api';
 import { showToast } from '../utils/toast';
+import { Animated } from '../components/Animated';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -63,7 +64,7 @@ const ResetPassword = () => {
   if (success) {
     return (
       <div className="auth-page">
-        <div className="auth-card">
+        <Animated animation="scale-up" as="div" className="auth-card">
           <div className="auth-header">
             <CheckCircle size={48} color="var(--color-success)" style={{ margin: '0 auto var(--space-md)' }} />
             <h1>Password Reset!</h1>
@@ -72,14 +73,14 @@ const ResetPassword = () => {
           <Link to="/login" className="btn btn-primary btn-block">
             Go to Login
           </Link>
-        </div>
+        </Animated>
       </div>
     );
   }
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <Animated animation="scale-up" as="div" className="auth-card">
         <div className="auth-header">
           <div className="auth-icon-wrapper">
             <Lock size={32} color="var(--color-primary-dark)" />
@@ -168,7 +169,7 @@ const ResetPassword = () => {
         <div className="auth-footer">
           <p>Remember your password? <Link to="/login">Sign In</Link></p>
         </div>
-      </div>
+      </Animated>
     </div>
   );
 };

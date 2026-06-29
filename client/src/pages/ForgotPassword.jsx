@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { api } from '../utils/api';
 import { showToast } from '../utils/toast';
+import { Animated } from '../components/Animated';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -30,7 +31,7 @@ const ForgotPassword = () => {
   if (sent) {
     return (
       <div className="auth-page">
-        <div className="auth-card">
+        <Animated animation="scale-up" as="div" className="auth-card">
           <div className="auth-header">
             <CheckCircle size={48} color="var(--color-success)" style={{ margin: '0 auto var(--space-md)' }} />
             <h1>Check Your Email</h1>
@@ -48,14 +49,14 @@ const ForgotPassword = () => {
           <div className="auth-footer">
             <p><Link to="/login"><ArrowLeft size={14} style={{ verticalAlign: 'middle' }} /> Back to Login</Link></p>
           </div>
-        </div>
+        </Animated>
       </div>
     );
   }
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <Animated animation="scale-up" as="div" className="auth-card">
         <div className="auth-header">
           <div className="auth-icon-wrapper">
             <Mail size={32} color="var(--color-primary-dark)" />
@@ -89,7 +90,7 @@ const ForgotPassword = () => {
         <div className="auth-footer">
           <p>Remember your password? <Link to="/login">Sign In</Link></p>
         </div>
-      </div>
+      </Animated>
     </div>
   );
 };

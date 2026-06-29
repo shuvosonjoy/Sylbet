@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Package } from 'lucide-react';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { Animated, StaggerContainer } from '../components/Animated';
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -40,7 +41,9 @@ const MyOrders = () => {
 
   return (
     <div className="container section">
-      <h1 className="section-title text-center">My Orders</h1>
+      <Animated animation="fade-up">
+        <h1 className="section-title text-center">My Orders</h1>
+      </Animated>
 
       {orders.length === 0 ? (
         <div className="empty-state">
@@ -50,7 +53,7 @@ const MyOrders = () => {
           <Link to="/shop" className="btn btn-primary" style={{ marginTop: '1rem' }}>Browse Products</Link>
         </div>
       ) : (
-        <div className="orders-list">
+        <StaggerContainer animation="fade-up" className="orders-list" staggerDelay={0.1}>
           {orders.map(order => (
             <div key={order._id} className="card order-card">
               <div className="order-card-header">
@@ -91,7 +94,7 @@ const MyOrders = () => {
               </div>
             </div>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );

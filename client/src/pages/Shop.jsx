@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import { api } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { ProductGridSkeleton } from '../components/Skeleton';
+import { Animated, StaggerContainer } from '../components/Animated';
 
 const Shop = () => {
   const location = useLocation();
@@ -109,7 +110,7 @@ const Shop = () => {
       </div>
 
       <div className="container section">
-        <div className="shop-header">
+        <Animated animation="fade-up" as="div" className="shop-header">
           <h1 className="shop-title">
             {activeSubcategoryName || activeCategoryName || 'All Products'}
           </h1>
@@ -135,7 +136,7 @@ const Shop = () => {
               </select>
             </div>
           </div>
-        </div>
+        </Animated>
 
         {/* Category & Subcategory Pills */}
         <div className="filter-section">
@@ -183,11 +184,13 @@ const Shop = () => {
           <ProductGridSkeleton count={8} />
         ) : products.length > 0 ? (
           <>
-            <div className="grid grid-cols-4">
+            <StaggerContainer animation="fade-up" className="grid grid-cols-4" staggerDelay={0.08}>
               {products.map(product => (
-                <ProductCard key={product._id} product={product} />
+                <div key={product._id}>
+                  <ProductCard product={product} />
+                </div>
               ))}
-            </div>
+            </StaggerContainer>
 
             {/* Pagination */}
             {totalPages > 1 && (

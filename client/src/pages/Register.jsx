@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from '../utils/toast';
+import { Animated } from '../components/Animated';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
@@ -37,7 +38,7 @@ const Register = () => {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <Animated animation="scale-up" as="div" className="auth-card">
         <div className="auth-header">
           <h1>Create Account</h1>
           <p>Join Sylbets for a premium shopping experience</p>
@@ -104,7 +105,7 @@ const Register = () => {
         <div className="auth-footer">
           <p>Already have an account? <Link to="/login">Sign In</Link></p>
         </div>
-      </div>
+      </Animated>
     </div>
   );
 };

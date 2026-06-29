@@ -33,6 +33,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/wishlist', require('./routes/wishlistRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/settings', require('./routes/settingRoutes'));
 
 // Root route
 app.get('/', (req, res) => {

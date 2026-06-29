@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Edit, Trash2, X, Home, Package, Layers, FolderTree, ShoppingBag, MessageSquare, Star, ChevronUp, ChevronDown } from 'lucide-react';
+import { LogOut, Plus, Edit, Trash2, X, Home, Package, Layers, FolderTree, ShoppingBag, MessageSquare, Star, ChevronUp, ChevronDown, Settings } from 'lucide-react';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from '../utils/toast';
@@ -37,6 +37,18 @@ const AdminDashboard = () => {
     existingImages: [], product: '', reviewDate: '', status: 'published',
     featured: false
   });
+
+  // Settings state
+  const [categoryCardStyle, setCategoryCardStyle] = useState('woven');
+  const [settingsSaving, setSettingsSaving] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'settings') {
+      api.getSetting('categoryCardStyle').then(res => {
+        if (res?.value) setCategoryCardStyle(res.value);
+      }).catch(() => {});
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     fetchData();
@@ -678,6 +690,73 @@ const AdminDashboard = () => {
         </div>
       );
     }
+
+    // SETTINGS
+    if (activeTab === 'settings') {
+      const styles = [
+        { id: 'woven', name: 'Woven Style', desc: 'Green background with woven texture pattern' },
+        { id: 'classic', name: 'Classic Style', desc: 'Original white card design' },
+      ];
+
+      const handleSaveSettings = async () => {
+        setSettingsSaving(true);
+        try {
+          await api.updateSetting('categoryCardStyle', categoryCardStyle, token);
+          showToast.success('Settings saved!');
+        } catch (error) {
+          showToast.error(error.message || 'Error saving settings');
+        } finally {
+          setSettingsSaving(false);
+        }
+      };
+
+      return (
+        <div className="settings-section">
+          <div className="admin-header">
+            <h2>Settings</h2>
+          </div>
+
+          <div className="settings-card">
+            <h3 className="settings-card-title">Category Card Style</h3>
+            <p className="settings-card-desc">Choose how category cards appear on the home page.</p>
+
+            <div className="style-options">
+              {styles.map(style => (
+                <div
+                  key={style.id}
+                  className={`style-option ${categoryCardStyle === style.id ? 'selected' : ''}`}
+                  onClick={() => setCategoryCardStyle(style.id)}
+                >
+                  <div className="style-option-radio" />
+                  <div className="style-option-name">{style.name}</div>
+                  <div className="style-option-desc">{style.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="settings-preview-label">Live Preview</div>
+            <div className="settings-preview-area">
+              <div className="settings-preview-card">
+                <div className={`category-card category-card-${categoryCardStyle}`}>
+                  <div className="category-card-image">
+                    <div className="category-fallback">C</div>
+                  </div>
+                  <h3 className="category-card-title">Cane Chairs</h3>
+                </div>
+              </div>
+            </div>
+
+            <button
+              className="btn btn-primary"
+              onClick={handleSaveSettings}
+              disabled={settingsSaving}
+            >
+              {settingsSaving ? 'Saving...' : 'Save Settings'}
+            </button>
+          </div>
+        </div>
+      );
+    }
   };
 
   // Modal Form
@@ -1034,6 +1113,7 @@ const AdminDashboard = () => {
     { id: 'subcategories', label: 'Subcategories', icon: FolderTree },
     { id: 'orders', label: 'Orders', icon: ShoppingBag },
     { id: 'reviews', label: 'Reviews', icon: MessageSquare },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (

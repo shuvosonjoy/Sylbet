@@ -50,6 +50,9 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
 
+  // Category card style setting
+  const [cardStyle, setCardStyle] = useState('woven');
+
   // Lightbox state
   const [lightbox, setLightbox] = useState({ open: false, images: [], index: 0 });
 
@@ -74,11 +77,12 @@ const Home = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [featuredRes, bestRes, subsRes, reviewsRes] = await Promise.all([
+        const [featuredRes, bestRes, subsRes, reviewsRes, cardStyleRes] = await Promise.all([
           api.getProducts({ featured: true, limit: 4 }),
           api.getProducts({ bestSelling: true, limit: 4 }),
           api.getSubcategories(),
-          api.getReviews()
+          api.getReviews(),
+          api.getSetting('categoryCardStyle')
         ]);
 
         const featuredProducts = featuredRes.products || [];
@@ -90,6 +94,7 @@ const Home = () => {
         setFeaturedProducts(featuredProducts);
         setBestSelling(bestSelling);
         setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
+        if (cardStyleRes?.value) setCardStyle(cardStyleRes.value);
 
         if (subsRes && subsRes.length > 0) {
           console.log('[DEBUG] Category data received from API:', subsRes);
@@ -255,7 +260,7 @@ const Home = () => {
                 >
                   <Link
                     to={`/shop?subcategory=${subcategory._id}`}
-                    className="category-card"
+                    className={`category-card category-card-${cardStyle}`}
                   >
                     <div className="category-card-image">
                       {subcategory.image ? (

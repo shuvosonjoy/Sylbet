@@ -293,5 +293,25 @@ export const api = {
       body: JSON.stringify({ orders })
     });
     return handleResponse(res);
+  },
+
+  // Settings
+  getSettings: async () => {
+    const res = await fetch(`${API_BASE}/settings`);
+    return handleResponse(res);
+  },
+
+  getSetting: async (key) => {
+    const res = await fetch(`${API_BASE}/settings/${key}`);
+    return handleResponse(res);
+  },
+
+  updateSetting: async (key, value, token) => {
+    const res = await fetch(`${API_BASE}/settings/${key}`, {
+      method: 'PUT',
+      headers: getHeaders(token),
+      body: JSON.stringify({ value })
+    });
+    return handleResponse(res);
   }
 };

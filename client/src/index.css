@@ -1766,10 +1766,10 @@ select.form-control {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(4,57,39,0.08), rgba(4,57,39,0.04));
+  background: rgba(255, 255, 255, 0.1);
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-primary-dark);
+  color: var(--color-white);
 }
 
 .categories-grid {
@@ -1791,18 +1791,34 @@ select.form-control {
 }
 
 .category-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
   padding: var(--space-lg);
-  background: var(--color-white);
+  background: linear-gradient(135deg, #043927 0%, #065f46 50%, #043927 100%);
   border-radius: var(--radius-lg);
   text-align: center;
   transition: all var(--transition-normal);
   border: 1px solid transparent;
   box-shadow: var(--shadow-sm);
   gap: var(--space-md);
+  overflow: hidden;
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('/pattern.svg');
+  background-repeat: repeat;
+  background-size: 180px auto;
+  background-position: center;
+  opacity: 0.12;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 0;
 }
 
 @media (max-width: 640px) {
@@ -1814,8 +1830,8 @@ select.form-control {
 
 .category-card:hover {
   transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
-  border-color: rgba(4, 57, 39, 0.12);
+  box-shadow: 0 10px 25px rgba(4, 57, 39, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .category-card:hover .category-card-image {
@@ -1823,16 +1839,19 @@ select.form-control {
 }
 
 .category-card:hover .category-card-title {
-  color: var(--color-primary);
+  color: var(--color-accent-light);
 }
 
 .category-card-image {
+  position: relative;
+  z-index: 1;
   width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(4,57,39,0.06), rgba(4,57,39,0.02));
+  background: rgba(255, 255, 255, 0.1);
   transition: transform var(--transition-normal);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .category-card-img {
@@ -1840,14 +1859,19 @@ select.form-control {
   height: 100%;
   object-fit: cover;
   display: block;
+  position: relative;
+  z-index: 1;
 }
 
 .category-card-title {
+  position: relative;
+  z-index: 1;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--color-primary-dark);
+  color: var(--color-white);
   transition: color var(--transition-normal);
   line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 640px) {

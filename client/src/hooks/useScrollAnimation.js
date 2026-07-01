@@ -81,9 +81,8 @@ export const useParallax = (speed = 0.3) => {
       ticking = true;
       requestAnimationFrame(() => {
         const rect = element.getBoundingClientRect();
-        const scrolled = window.innerHeight - rect.top;
         if (rect.top < window.innerHeight && rect.bottom > 0) {
-          const offset = scrolled * speed;
+          const offset = window.scrollY * speed;
           element.style.transform = `translate3d(0, ${offset}px, 0)`;
         }
         ticking = false;

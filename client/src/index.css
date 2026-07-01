@@ -1508,17 +1508,15 @@ select.form-control {
 
 .hero-bg-pattern {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: -100px; left: 0; right: 0; bottom: -100px;
   z-index: 3;
   pointer-events: none;
   background-image: url('/pattern.svg');
   background-repeat: repeat;
   background-size: 350px auto;
-  background-position: center;
+  background-position: top left;
   opacity: 0.12;
   mix-blend-mode: soft-light;
-  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
 }
 
 
